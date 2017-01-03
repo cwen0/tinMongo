@@ -4,8 +4,8 @@ import (
 	"html/template"
 	"runtime"
 
-	"github.com/cwen-coder/tinMongo/config"
-	"github.com/cwen-coder/tinMongo/routes"
+	"github.com/cwen0/tinMongo/config"
+	"github.com/cwen0/tinMongo/routes"
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
