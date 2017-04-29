@@ -1,30 +1,31 @@
 package handler
 
 import (
-	// "github.com/go-martini/martini"
-	"github.com/martini-contrib/render"
+	"net/http"
+
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
-func DbHome(r render.Render) {
-	r.HTML(200, "db/home", map[string]interface{}{})
+func DbHome(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/home.html", nil)
 }
 
-func DbNewCollection(r render.Render) {
-	r.HTML(200, "db/newCollection", map[string]interface{}{})
+func DbNewCollection(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/newCollection.html", nil)
 }
 
-func DbTransfer(r render.Render) {
-	r.HTML(200, "db/dbTransfer", map[string]interface{}{})
+func DbTransfer(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/dbTransfer.html", nil)
 }
 
-func DbExport(r render.Render) {
-	r.HTML(200, "db/dbExport", map[string]interface{}{})
+func DbExport(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/dbExport.html", nil)
 }
 
-func DbImport(r render.Render) {
-	r.HTML(200, "db/dbImport", map[string]interface{}{})
+func DbImport(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/dbImport.html", nil)
 }
 
-func DbUsers(r render.Render) {
-	r.HTML(200, "db/dbUsers", map[string]interface{}{})
+func DbUsers(c *gin.Context) {
+	c.HTML(http.StatusOK, "db/dbUsers.html", nil)
 }

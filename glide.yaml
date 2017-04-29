@@ -2,4 +2,7 @@ package: github.com/cwen0/tinMongo
 import:
 - package: github.com/Unknwon/goconfig
 - package: github.com/go-martini/martini
+  version: ~1.0.0
 - package: github.com/martini-contrib/render
+- package: gopkg.in/gin-gonic/gin.v1
+  version: ~1.1.4

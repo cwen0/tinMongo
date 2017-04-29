@@ -1,10 +1,11 @@
 package handler
 
 import (
-	// "github.com/go-martini/martini"
-	"github.com/martini-contrib/render"
+	"net/http"
+
+	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
-func Login(r render.Render) {
-	r.HTML(200, "login/login", nil)
+func Login(c *gin.Context) {
+	c.HTML(http.StatusOK, "login/login.html", nil)
 }
