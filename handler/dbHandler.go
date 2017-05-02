@@ -3,29 +3,29 @@ package handler
 import (
 	"net/http"
 
-	gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
 func DbHome(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/home.html", nil)
+	c.HTML(http.StatusOK, "db/home", map[string]interface{}{})
 }
 
 func DbNewCollection(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/newCollection.html", nil)
+	c.HTML(http.StatusOK, "db/newCollection", map[string]interface{}{})
 }
 
 func DbTransfer(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbTransfer.html", nil)
+	c.HTML(http.StatusOK, "db/dbTransfer", map[string]interface{}{})
 }
 
 func DbExport(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbExport.html", nil)
+	c.HTML(http.StatusOK, "db/dbExport", map[string]interface{}{})
 }
 
 func DbImport(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbImport.html", nil)
+	c.HTML(http.StatusOK, "db/dbImport", map[string]interface{}{})
 }
 
 func DbUsers(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbUsers.html", nil)
+	c.HTML(http.StatusOK, "db/dbUsers", map[string]interface{}{})
 }

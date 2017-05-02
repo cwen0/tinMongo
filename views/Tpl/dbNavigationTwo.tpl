@@ -1,3 +1,4 @@
+{{define "Tpl/dbNavigationTwo"}}
 <div>
   <ul class="am-nav am-nav-tabs">
     <li  {{if equal .active "home" }}class="am-active" {{end}}><a href="/db/home">统计</a></li>
@@ -19,3 +20,4 @@
     </li> -->
   </ul>
 </div>
+{{end}}

@@ -1,3 +1,4 @@
+{{define "db/transfer"}}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
@@ -16,7 +17,7 @@
         克隆<span class="am-icon-chevron-down am-fr" ></span></div>
      <div id="database-statistics" class="am-in am-container">
      <br>
-  
+
         <form class="am-form am-form-horizontal am-container" >
             <div>
               <strong>
@@ -24,7 +25,7 @@
                   <input type="checkbox" id = "dbTransferAll" value="">
                 </label>]</span>
               </strong>
-             
+
               <hr>
               <div class="am-form-group">
                 <label class="am-checkbox-inline">
@@ -63,7 +64,7 @@
               <label class="am-u-sm-2 am-form-label">Authenticate?</label>
               <div class="am-u-sm-8 am-u-end am-checkbox me-cap-cal-op-checkbox" >
                   <label>
-                      <input type="checkbox"> 
+                      <input type="checkbox">
                   </label>
                 </div>
             </div>
@@ -87,7 +88,7 @@
                   <label class="am-u-sm-2 am-form-label">Copy Indexes?</label>
                     <div class="am-u-sm-8 am-u-end am-checkbox me-cap-cal-op-checkbox" >
                   <label>
-                    <input type="checkbox" checked="checked"> 
+                    <input type="checkbox" checked="checked">
                   </label>
                 </div>
                 </div>
@@ -99,7 +100,7 @@
                 <button type="button" class="am-btn am-btn-primary am-btn-block">克隆</button>
               </div>
               </div>
-          
+
         </form>
         <br>
         </div>
@@ -113,3 +114,4 @@
 <script src="/js/db/dbTransfer.js"></script>
 </body>
 </html>
+{{end}}

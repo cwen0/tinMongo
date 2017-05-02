@@ -2,17 +2,11 @@ package router
 
 import (
 	"github.com/cwen0/tinMongo/handler"
-	"github.com/go-martini/martini"
-	gin "gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 )
 
-func Route(m *martini.ClassicMartini) {
-}
-
-func Init() *gin.Engine {
-	r := gin.Default()
+func SetRoutes(r *gin.Engine) *gin.Engine {
 	r.GET("/login", handler.Login)
-
 	r.GET("/home", handler.Home)
 	r.GET("/status", handler.Status)
 	r.GET("/databases", handler.Databases)

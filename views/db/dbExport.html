@@ -1,3 +1,4 @@
+{{define "db/export" }}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
@@ -16,7 +17,7 @@
         导出<span class="am-icon-chevron-down am-fr" ></span></div>
      <div id="database-statistics" class="am-in am-container">
      <br>
-  
+
         <form class="am-form am-form-horizontal am-container" >
             <div>
               <strong>
@@ -24,7 +25,7 @@
                   <input type="checkbox" id = "dbExportAll" value="">
                 </label>]</span>
               </strong>
-             
+
               <hr>
               <div class="am-form-group">
                 <label class="am-checkbox-inline">
@@ -50,7 +51,7 @@
           <div>
             <strong>
                <span>Compressed:   &nbsp;&nbsp;&nbsp;<label>
-                  <input type="checkbox"  value="">GZIP 
+                  <input type="checkbox"  value="">GZIP
                 </label>
                 </span>
             </strong>
@@ -76,3 +77,4 @@
 <script src="/js/db/dbExport.js"></script>
 </body>
 </html>
+{{end}}

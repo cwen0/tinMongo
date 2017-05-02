@@ -1,35 +1,45 @@
 package main
 
 import (
+	"html/template"
+	"net/http"
+	"os"
+	"strings"
+
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/cwen0/tinMongo/router"
+	"github.com/cwen0/tinMongo/utils"
+	"github.com/gin-gonic/gin"
 )
 
-//func main() {
-//runtime.GOMAXPROCS(runtime.NumCPU())
-//m := martini.Classic()
-//m.Use(render.Renderer(render.Options{
-//Directory:  "templates",
-//Extensions: []string{".tpl", ".html"},
-//Charset:    "UTF-8",
-//Funcs: []template.FuncMap{
-//{
-//"set": func(renderArgs map[string]interface{}, key string, value interface{}) template.JS {
-//renderArgs[key] = value
-//return template.JS("")
-//},
-//"equal": func(args ...interface{}) bool {
-//return args[0] == args[1]
-//},
-//},
-//},
-//}))
-//routes.Route(m)
-//port := ":" + config.GetPort()
-//m.RunOnAddr(port)
-//m.Run()
-//}
-
 func main() {
-	r := router.Init()
+	r := gin.Default()
+	setTemplate(r)
+
+	r.StaticFS("/public", http.Dir("public"))
+	router.SetRoutes(r)
 	r.Run()
+}
+
+//setTemplate loads templates from rice box "views"
+func setTemplate(r *gin.Engine) {
+	box := rice.MustFindBox("views")
+	tmpl := template.New("").Funcs(utils.TemplateFuncMap)
+
+	fn := func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() != true && (strings.HasSuffix(f.Name(), ".html") || strings.HasSuffix(f.Name(), ".tpl")) {
+			var err error
+			tmpl, err = tmpl.Parse(box.MustString(path))
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	err := box.Walk("", fn)
+	if err != nil {
+		panic(err)
+	}
+	r.SetHTMLTemplate(tmpl)
 }

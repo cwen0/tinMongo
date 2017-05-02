@@ -1,3 +1,4 @@
+{{define "Tpl/sidebar"}}
 <div class="am-cf admin-main" id = "adminMain">
   <!-- sidebar start -->
   <div class="admin-sidebar am-offcanvas" id="admin-offcanvas">
@@ -21,7 +22,7 @@
           </button>
         </li>
       </ul>
-    </div>     
+    </div>
       <div class="am-panel am-panel-default admin-sidebar-panel">
         <div class="am-panel-bd">
           <p><span class="am-icon-bookmark"></span> 公告</p>
@@ -39,10 +40,10 @@
 
   <!-- sidebar end -->
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/amazeui.min.js"></script>
-<script src="/js/amazeui.tree.min.js"></script>
-<script src="/js/app.js"></script>
+<script src="/public/js/jquery.min.js"></script>
+<script src="/public/js/amazeui.min.js"></script>
+<script src="/public/js/amazeui.tree.min.js"></script>
+<script src="/public/js/app.js"></script>
 <script>
   // demo 1
   var data = [
@@ -97,3 +98,5 @@
     folderSelect: false
   });
 </script>
+
+{{end}}

@@ -1,33 +1,31 @@
 package handler
 
-import (
-	gin "gopkg.in/gin-gonic/gin.v1"
-)
+import "github.com/gin-gonic/gin"
 
 func Home(c *gin.Context) {
-	c.HTML(200, "server/home.html", nil)
+	c.HTML(200, "server/home", map[string]interface{}{})
 }
 
 func Status(c *gin.Context) {
-	c.HTML(200, "server/status.html", nil)
+	c.HTML(200, "server/status", map[string]interface{}{})
 }
 
 func Databases(c *gin.Context) {
-	c.HTML(200, "server/databases.html", nil)
+	c.HTML(200, "server/databases", map[string]interface{}{})
 }
 
 func ProcessList(c *gin.Context) {
-	c.HTML(200, "server/processList.html", nil)
+	c.HTML(200, "server/processList", map[string]interface{}{})
 }
 
 func Command(c *gin.Context) {
-	c.HTML(200, "server/command.html", nil)
+	c.HTML(200, "server/command", map[string]interface{}{})
 }
 
 func Execute(c *gin.Context) {
-	c.HTML(200, "server/execute.html", nil)
+	c.HTML(200, "server/execute", map[string]interface{}{})
 }
 
 func Replication(c *gin.Context) {
-	c.HTML(200, "server/replication.html", nil)
+	c.HTML(200, "server/replication", map[string]interface{}{})
 }

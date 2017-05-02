@@ -1,3 +1,4 @@
+{{define "db/import"}}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
@@ -16,13 +17,13 @@
         导入<span class="am-icon-chevron-down am-fr" ></span></div>
      <div id="database-statistics" class="am-in am-container">
      <br>
-  
+
         <form class="am-form am-form-horizontal am-container" >
             <div>
               <strong>
                  <span>.JS file exported with RockMongo:</span>
               </strong>
-             
+
               <hr>
               <div class="am-form-group am-form-file">
                 <span>JS File: </span>
@@ -30,7 +31,7 @@
                     <i class="am-icon-cloud-upload"></i> 选择要上传的文件</button>
                   <input id="js-file"  type="file" multiple>
                   <span id="js-file-list"></span>
-              </div>       
+              </div>
           </div>
           <div>
             <strong><span>Confirm</span></strong>
@@ -38,7 +39,7 @@
             <div class="am-u-sm-8 am-u-sm-centered">
               <button type="button" class="am-btn am-btn-primary am-btn-block">导入</button>
             </div>
-            </div>    
+            </div>
         </form>
         <br>
         <br>
@@ -55,9 +56,9 @@
             <div class="am-u-sm-8 am-u-end" >
               <input type="text">
             </div>
-          </div> 
+          </div>
           <div class="am-form-group am-form-file">
-           
+
               <span>JSON File: </span>
               <button type="button" class="am-btn am-btn-default am-btn-sm">
                   <i class="am-icon-cloud-upload"></i> 选择要上传的文件</button>
@@ -84,3 +85,4 @@
 {{template "Tpl/footer" .}}
 </body>
 </html>
+{{end}}

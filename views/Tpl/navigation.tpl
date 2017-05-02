@@ -1,3 +1,4 @@
+{{define "Tpl/navigation"}}
 <div>
   <ul class="am-nav am-nav-tabs">
     <li {{if equal .active "home"}}class="am-active" {{end}}><a href="/home">服务器</a></li>
@@ -17,3 +18,4 @@
     </li> -->
   </ul>
 </div>
+{{end}}

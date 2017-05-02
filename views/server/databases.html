@@ -1,11 +1,12 @@
+{{define "server/databases"}}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
 {{set . "active" "databases"}}
   <div class="admin-content">
   {{template "Tpl/navigation" .}}
-      
-        
+
+
       <div class="am-g am-g-fixed am-margin-top">
           <div >
               <a href=""><i class="am-icon-plus"></i>创建数据库</a>
@@ -25,7 +26,7 @@
             </thead>
               <tbody>
                 <tr>
-                  
+
                 </tr>
               </tbody>
             </table>
@@ -38,3 +39,4 @@
 
   </body>
   </html>
+{{end}}

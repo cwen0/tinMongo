@@ -1,3 +1,4 @@
+{{define "server/status"}}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
@@ -50,7 +51,7 @@
                        "warning": NumberInt(0),
                        "msg": NumberInt(0),
                        "user": NumberInt(13),
-                       "rollovers": NumberInt(0) 
+                       "rollovers": NumberInt(0)
                     }
                 </td>
                 </tr>
@@ -62,7 +63,7 @@
                        "total_ms": NumberInt(106818),
                        "average_ms": 1.305396685731,
                        "last_ms": NumberInt(3),
-                       "last_finished": ISODate("2016-01-31T13:48:27.742Z") 
+                       "last_finished": ISODate("2016-01-31T13:48:27.742Z")
                     }
                   </td>
                 </tr>
@@ -72,7 +73,7 @@
                     {
                        "current": NumberInt(2),
                        "available": NumberInt(51198),
-                       "totalCreated": NumberLong(540) 
+                       "totalCreated": NumberLong(540)
                     }
                   </td>
                 </tr>
@@ -85,7 +86,7 @@
                        "totalOpen": NumberInt(0),
                        "pinned": NumberInt(0),
                        "totalNoTimeout": NumberInt(0),
-                       "timedOut": NumberInt(0) 
+                       "timedOut": NumberInt(0)
                     }
                   </td>
                 </tr>
@@ -104,8 +105,8 @@
                          "prepLogBuffer": NumberInt(0),
                          "writeToJournal": NumberInt(0),
                          "writeToDataFiles": NumberInt(0),
-                         "remapPrivateView": NumberInt(0) 
-                      } 
+                         "remapPrivateView": NumberInt(0)
+                      }
                     }
                   </td>
                 </tr>
@@ -115,7 +116,7 @@
                     {
                        "note": "fields vary by platform",
                        "heap_usage_bytes": NumberInt(62607776),
-                       "page_faults": NumberInt(2882) 
+                       "page_faults": NumberInt(2882)
                     }
                   </td>
                 </tr>
@@ -128,13 +129,13 @@
                        "currentQueue": {
                          "total": NumberInt(0),
                          "readers": NumberInt(0),
-                         "writers": NumberInt(0) 
+                         "writers": NumberInt(0)
                       },
                        "activeClients": {
                          "total": NumberInt(0),
                          "readers": NumberInt(0),
-                         "writers": NumberInt(0) 
-                      } 
+                         "writers": NumberInt(0)
+                      }
                     }
                   </td>
                 </tr>
@@ -146,7 +147,7 @@
                        "hits": NumberInt(466),
                        "misses": NumberInt(0),
                        "resets": NumberInt(0),
-                       "missRatio": 0 
+                       "missRatio": 0
                     }
                   </td>
                 </tr>
@@ -157,43 +158,43 @@
                        ".": {
                          "timeLockedMicros": {
                            "R": NumberLong(99665727),
-                           "W": NumberLong(44502256) 
+                           "W": NumberLong(44502256)
                         },
                          "timeAcquiringMicros": {
                            "R": NumberLong(53720198),
-                           "W": NumberLong(13339342) 
-                        } 
+                           "W": NumberLong(13339342)
+                        }
                       },
                        "admin": {
                          "timeLockedMicros": {
                            "r": NumberLong(34729476),
-                           "w": NumberLong(0) 
+                           "w": NumberLong(0)
                         },
                          "timeAcquiringMicros": {
                            "r": NumberLong(9258775),
-                           "w": NumberLong(0) 
-                        } 
+                           "w": NumberLong(0)
+                        }
                       },
                        "local": {
                          "timeLockedMicros": {
                            "r": NumberLong(16524416),
-                           "w": NumberLong(23) 
+                           "w": NumberLong(23)
                         },
                          "timeAcquiringMicros": {
                            "r": NumberLong(6369271),
-                           "w": NumberLong(1) 
-                        } 
+                           "w": NumberLong(1)
+                        }
                       },
                        "cwenwx": {
                          "timeLockedMicros": {
                            "r": NumberLong(6708254),
-                           "w": NumberLong(61980) 
+                           "w": NumberLong(61980)
                         },
                          "timeAcquiringMicros": {
                            "r": NumberLong(2081831),
-                           "w": NumberLong(21) 
-                        } 
-                      } 
+                           "w": NumberLong(21)
+                        }
+                      }
                     }
                   </td>
                 </tr>
@@ -203,7 +204,7 @@
                     {
                        "bytesIn": NumberInt(510189),
                        "bytesOut": NumberInt(1404866),
-                       "numRequests": NumberInt(6156) 
+                       "numRequests": NumberInt(6156)
                     }
                   </td>
                 </tr>
@@ -216,7 +217,7 @@
                        "update": NumberInt(0),
                        "delete": NumberInt(0),
                        "getmore": NumberInt(0),
-                       "command": NumberInt(4159) 
+                       "command": NumberInt(4159)
                     }
                   </td>
                 </tr>
@@ -229,7 +230,7 @@
                        "update": NumberInt(0),
                        "delete": NumberInt(0),
                        "getmore": NumberInt(0),
-                       "command": NumberInt(0) 
+                       "command": NumberInt(0)
                     }
                   </td>
               </tr>
@@ -241,16 +242,16 @@
                      "pageFaultExceptionsThrown": NumberInt(0),
                      "admin": {
                        "accessesNotInMemory": NumberInt(1),
-                       "pageFaultExceptionsThrown": NumberInt(0) 
+                       "pageFaultExceptionsThrown": NumberInt(0)
                     },
                      "cwenwx": {
                        "accessesNotInMemory": NumberInt(0),
-                       "pageFaultExceptionsThrown": NumberInt(0) 
+                       "pageFaultExceptionsThrown": NumberInt(0)
                     },
                      "local": {
                        "accessesNotInMemory": NumberInt(1),
-                       "pageFaultExceptionsThrown": NumberInt(0) 
-                    } 
+                       "pageFaultExceptionsThrown": NumberInt(0)
+                    }
                   }
                 </td>
               </tr>
@@ -269,7 +270,7 @@
                      "virtual": NumberInt(684),
                      "supported": true,
                      "mapped": NumberInt(240),
-                     "mappedWithJournal": NumberInt(480) 
+                     "mappedWithJournal": NumberInt(480)
                   }
                 </td>
               </tr>
@@ -282,81 +283,81 @@
                          "open": {
                            "noTimeout": NumberLong(0),
                            "pinned": NumberLong(0),
-                           "total": NumberLong(0) 
-                        } 
+                           "total": NumberLong(0)
+                        }
                       },
                        "document": {
                          "deleted": NumberLong(0),
                          "inserted": NumberLong(2),
                          "returned": NumberLong(3604),
-                         "updated": NumberLong(0) 
+                         "updated": NumberLong(0)
                       },
                        "getLastError": {
                          "wtime": {
                            "num": NumberInt(0),
-                           "totalMillis": NumberInt(0) 
+                           "totalMillis": NumberInt(0)
                         },
-                         "wtimeouts": NumberLong(0) 
+                         "wtimeouts": NumberLong(0)
                       },
                        "operation": {
                          "fastmod": NumberLong(0),
                          "idhack": NumberLong(0),
-                         "scanAndOrder": NumberLong(2) 
+                         "scanAndOrder": NumberLong(2)
                       },
                        "queryExecutor": {
                          "scanned": NumberLong(2),
-                         "scannedObjects": NumberLong(2) 
+                         "scannedObjects": NumberLong(2)
                       },
                        "record": {
-                         "moves": NumberLong(0) 
+                         "moves": NumberLong(0)
                       },
                        "repl": {
                          "apply": {
                            "batches": {
                              "num": NumberInt(0),
-                             "totalMillis": NumberInt(0) 
+                             "totalMillis": NumberInt(0)
                           },
-                           "ops": NumberLong(0) 
+                           "ops": NumberLong(0)
                         },
                          "buffer": {
                            "count": NumberLong(0),
                            "maxSizeBytes": NumberInt(268435456),
-                           "sizeBytes": NumberLong(0) 
+                           "sizeBytes": NumberLong(0)
                         },
                          "network": {
                            "bytes": NumberLong(0),
                            "getmores": {
                              "num": NumberInt(0),
-                             "totalMillis": NumberInt(0) 
+                             "totalMillis": NumberInt(0)
                           },
                            "ops": NumberLong(0),
-                           "readersCreated": NumberLong(0) 
+                           "readersCreated": NumberLong(0)
                         },
                          "preload": {
                            "docs": {
                              "num": NumberInt(0),
-                             "totalMillis": NumberInt(0) 
+                             "totalMillis": NumberInt(0)
                           },
                            "indexes": {
                              "num": NumberInt(0),
-                             "totalMillis": NumberInt(0) 
-                          } 
-                        } 
+                             "totalMillis": NumberInt(0)
+                          }
+                        }
                       },
                        "storage": {
                          "freelist": {
                            "search": {
                              "bucketExhausted": NumberLong(0),
                              "requests": NumberLong(17),
-                             "scanned": NumberLong(29) 
-                          } 
-                        } 
+                             "scanned": NumberLong(29)
+                          }
+                        }
                       },
                        "ttl": {
                          "deletedDocuments": NumberLong(0),
-                         "passes": NumberLong(81828) 
-                      } 
-                    }                 
+                         "passes": NumberLong(81828)
+                      }
+                    }
                 </td>
               </tr>
             </tbody>
@@ -372,3 +373,4 @@
 
 </body>
 </html>
+{{end}}

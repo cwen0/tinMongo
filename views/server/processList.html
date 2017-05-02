@@ -1,11 +1,12 @@
+{{define "server/processList"}}
 {{template "Tpl/header" .}}
 {{template "Tpl/headerSecond" .}}
 {{template "Tpl/sidebar" .}}
 {{set . "active" "processList"}}
   <div class="admin-content">
   {{template "Tpl/navigation" .}}
-      
-        
+
+
       <div class="am-g am-g-fixed am-margin-top">
         <div class="am-panel am-panel-default">
         <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#processList-info'}">进程 (db.$cmd.sys.inprog.find({$all:1})) <span class="am-icon-chevron-down am-fr" ></span></div>
@@ -24,7 +25,7 @@
             </thead>
               <tbody>
                 <tr>
-                  
+
                 </tr>
               </tbody>
             </table>
@@ -37,3 +38,4 @@
 
   </body>
   </html>
+{{end}}
