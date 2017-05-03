@@ -1,4 +1,4 @@
-package handler
+package controllers
 
 import (
 	"net/http"
@@ -7,5 +7,6 @@ import (
 )
 
 func Login(c *gin.Context) {
+
 	c.HTML(http.StatusOK, "login/login", nil)
 }

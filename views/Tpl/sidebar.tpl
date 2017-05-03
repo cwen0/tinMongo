@@ -40,10 +40,10 @@
 
   <!-- sidebar end -->
 
-<script src="/public/js/jquery.min.js"></script>
-<script src="/public/js/amazeui.min.js"></script>
-<script src="/public/js/amazeui.tree.min.js"></script>
-<script src="/public/js/app.js"></script>
+<script type="text/javascript" src="/public/js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="/public/js/amazeui.js"></script>
+<script type="text/javascript" src="/public/js/amazeui.tree.js"></script>
+<script type="text/javascript" src="/public/js/app.js"></script>
 <script>
   // demo 1
   var data = [

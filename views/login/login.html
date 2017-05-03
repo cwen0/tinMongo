@@ -10,25 +10,7 @@
 	<meta name="renderer" content="webkit">
 	<meta http-equiv="Cache-Control" content="no-siteapp" />
 	<link rel="stylesheet" href="/public/css/amazeui.min.css"/>
-	<style>
-	  .header {
-	    text-align: center;
-	  }
-	  .header h1 {
-	    font-size: 200%;
-	    color: #333;
-	    margin-top: 30px;
-	  }
-	  .header p {
-	    font-size: 14px;
-	  }
-	.notAdmin {
-		background:#eee;
-	}
-	.loginFont{
-		background:#eee;
-	}
-	</style>
+	<link rel="stylesheet" href="/public/css/login.css"/>
 </head>
 <body>
 	<div class="header">
@@ -42,37 +24,58 @@
 	  <hr />
 	</div>
 	<br>
-	<div class="am-g">
+	<div id = "login-auth"  class="am-g">
 	  <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-	    <form method="post" class="am-form">
-		<div class="loginFont">
-		     <strong>
-			<span>Login:</span>
-		     </strong>
-		</div>
-		<br>
-	      <label for="UserName">UserName:</label>
-	      <input type="text" name="" id="UserName" value="">
-	      <label for="password">Password:</label>
-	      <input type="password" name="" id="password" value="">
-		<br>
-		<div class="notAdmin">
-		     <strong>
-			<span>Non-Admin users:</span>
-		     </strong>
-		</div>
-		<br>
-	     	<label for="DBName">DB Name(s)</label>
-	     	<input type="text" id="DBName" value="">
-	      <br />
-	      <div class="am-cf">
-	        <input type="submit" name="" value="登 录" class="am-btn am-btn-primary am-btn-sm am-fl">
-	      </div>
+        <form class="am-form am-form-horizontal">
+         <div class="am-form-group">
+            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">HostName</label>
+            <div class="am-u-sm-9">
+                 <input type="email" id="doc-ipt-3" placeholder="localhost">
+            </div>
+        </div>
+         <div class="am-form-group">
+            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Port</label>
+            <div class="am-u-sm-9">
+                 <input type="email" id="doc-ipt-3" placeholder="27017">
+            </div>
+        </div>
+         <div class="am-form-group am-form-select">
+            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Authentication</label>
+            <div class="am-u-sm-9">
+                <select v-model="selected" class=" am-input-lg">
+                   <option value="0">None</option>
+                   <option value="1">Username / Password</option>
+                </select>
+            </div>
+        </div>
+        <div v-show="open" >
+            <div class="am-form-group">
+                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Username</label>
+                <div class="am-u-sm-9">
+                     <input type="email" id="doc-ipt-3" placeholder="">
+                </div>
+            </div>
+            <div class="am-form-group">
+                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Password</label>
+                <div class="am-u-sm-9">
+                     <input type="email" id="doc-ipt-3" placeholder="">
+                </div>
+            </div>
+            <div class="am-form-group">
+                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Database</label>
+                <div class="am-u-sm-9">
+                     <input type="email" id="doc-ipt-3" placeholder="admin">
+                </div>
+            </div>
+        </div>
+
 	    </form>
 	    <hr>
-	    <p>© 2016 CWen  &&  zjj.</p>
+	    <p>© 2017 CWen .</p>
 	  </div>
 	</div>
 </body>
 </html>
+<script type="text/javascript" src="/public/js/vue.js"></script>
+<script type="text/javascript" src="/public/js/login/login.js"></script>
 {{end}}
