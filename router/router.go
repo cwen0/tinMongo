@@ -6,7 +6,8 @@ import (
 )
 
 func SetRoutes(r *gin.Engine) *gin.Engine {
-	r.GET("/login", controllers.Login)
+	r.GET("/login", controllers.LoginGet)
+	r.POST("/login", controllers.LoginPost)
 	r.GET("/home", controllers.Home)
 	r.GET("/status", controllers.Status)
 	r.GET("/databases", controllers.Databases)

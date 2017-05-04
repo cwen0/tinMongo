@@ -7,18 +7,20 @@ import (
 	"strings"
 
 	rice "github.com/GeertJohan/go.rice"
+	"github.com/Sirupsen/logrus"
 	"github.com/cwen0/tinMongo/router"
 	"github.com/cwen0/tinMongo/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	setLogger()
 	r := gin.Default()
 	setTemplate(r)
 
 	r.StaticFS("/public", http.Dir("public"))
 	router.SetRoutes(r)
-	r.Run()
+	r.Run(":3000")
 }
 
 //setTemplate loads templates from rice box "views"
@@ -42,4 +44,12 @@ func setTemplate(r *gin.Engine) {
 		panic(err)
 	}
 	r.SetHTMLTemplate(tmpl)
+}
+
+func setLogger() {
+	logrus.SetFormatter(&logrus.TextFormatter{})
+	logrus.SetOutput(os.Stderr)
+	if gin.Mode() == gin.DebugMode {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
 }

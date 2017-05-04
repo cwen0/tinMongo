@@ -13,8 +13,13 @@
 	<link rel="stylesheet" href="/public/css/login.css"/>
 </head>
 <body>
+<div id = "login-auth" >
 	<div class="header">
-	  <div class="am-g">
+		<div class="am-alert a am-alert-warning" data-am-alert id = "msg_alert" v-show="has_msg" >
+		  <button type="button" v-on:click="has_msg = false" class="am-close">&times;</button>
+		  <p> ${ msg } </p>
+		</div>
+  <div class="am-g">
 	    <h1>TinMongo</h1>
 	    <strong>
 	    	<p>Welcome to use TinMongo<br/>欢迎使用TinMongo</p>
@@ -24,58 +29,66 @@
 	  <hr />
 	</div>
 	<br>
-	<div id = "login-auth"  class="am-g">
+	<div   class="am-g">
 	  <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-        <form class="am-form am-form-horizontal">
-         <div class="am-form-group">
-            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">HostName</label>
-            <div class="am-u-sm-9">
-                 <input type="email" id="doc-ipt-3" placeholder="localhost">
-            </div>
-        </div>
-         <div class="am-form-group">
-            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Port</label>
-            <div class="am-u-sm-9">
-                 <input type="email" id="doc-ipt-3" placeholder="27017">
-            </div>
-        </div>
-         <div class="am-form-group am-form-select">
-            <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Authentication</label>
-            <div class="am-u-sm-9">
-                <select v-model="selected" class=" am-input-lg">
-                   <option value="0">None</option>
-                   <option value="1">Username / Password</option>
-                </select>
-            </div>
-        </div>
-        <div v-show="open" >
+        <div  class="am-form am-form-horizontal">
+	         <div class="am-form-group">
+	            <label class="am-u-sm-3 am-form-label">HostName</label>
+	            <div class="am-u-sm-9">
+	                 <input type="text" placeholder="localhost" v-model="item.hostname" >
+	            </div>
+	        </div>
+	         <div class="am-form-group">
+	            <label class="am-u-sm-3 am-form-label">Port</label>
+	            <div class="am-u-sm-9">
+	                 <input type="number" placeholder="27017" v-model="item.port" >
+	            </div>
+	        </div>
+	         <div class="am-form-group am-form-select">
+	            <label class="am-u-sm-3 am-form-label">Authentication</label>
+	            <div class="am-u-sm-9">
+	                <select v-model="selected" class=" am-input-lg">
+	                   <option value="0">None</option>
+	                   <option value="1">Username / Password</option>
+	                </select>
+	            </div>
+	        </div>
+	        <div v-show="open" >
+	            <div class="am-form-group">
+	                <label class="am-u-sm-3 am-form-label">Username</label>
+	                <div  class="am-u-sm-9">
+	                     <input type="text" placeholder="" v-model="item.username" >
+	                </div>
+	            </div>
+	            <div class="am-form-group">
+	                <label class="am-u-sm-3 am-form-label">Password</label>
+	                <div class="am-u-sm-9">
+	                     <input type="text" placeholder="" v-model="item.password" >
+	                </div>
+	            </div>
+	            <div class="am-form-group">
+	                <label class="am-u-sm-3 am-form-label">Database</label>
+	                <div class="am-u-sm-9">
+	                     <input type="text" placeholder="admin" v-model="item.database" >
+	                </div>
+	            </div>
+	        </div>
             <div class="am-form-group">
-                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Username</label>
-                <div class="am-u-sm-9">
-                     <input type="email" id="doc-ipt-3" placeholder="">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Password</label>
-                <div class="am-u-sm-9">
-                     <input type="email" id="doc-ipt-3" placeholder="">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3" class="am-u-sm-3 am-form-label">Database</label>
-                <div class="am-u-sm-9">
-                     <input type="email" id="doc-ipt-3" placeholder="admin">
-                </div>
-            </div>
-        </div>
-
-	    </form>
+			    <div class="am-u-sm-9 am-u-sm-offset-3">
+			      <button class="am-u-sm-12 am-btn am-btn-default"  @click="loginAction" >  login  </button>
+			    </div>
+			</div> 
+	    </div>
 	    <hr>
 	    <p>© 2017 CWen .</p>
 	  </div>
 	</div>
+</div>
+
+	<script type="text/javascript" src="/public/js/vue.js"></script>
+	<script type="text/javascript" src="/public/js/vue-resource.js"></script>
+	<script type="text/javascript" src="/public/js/login/login.js"></script>
 </body>
 </html>
-<script type="text/javascript" src="/public/js/vue.js"></script>
-<script type="text/javascript" src="/public/js/login/login.js"></script>
+
 {{end}}
