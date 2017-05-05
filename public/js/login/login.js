@@ -1,3 +1,4 @@
+// let router = new VueRouter();
 var login = new Vue({
 	delimiters: ['${', '}'],
 	el: "#login-auth",
@@ -8,7 +9,8 @@ var login = new Vue({
 		selected: "0",
 		item: {
 			hostname: "localhost",
-			port: 27017
+			port: 27017, 
+			database: "admin",
 		},
 		loginUrl: "/login"
 	},
@@ -34,13 +36,18 @@ var login = new Vue({
 					return 
 				}
 			}
+			
             this.$http.post(this.loginUrl, this.item)
                 .then((response) => {
-                
+                //router.redirect("/server/home")
+                location.href = "/home";
             }).catch(this.requestError)
 		},
 		requestError: function(response) {
-				this.msg = response.json()
+			console.log(response);
+			data = JSON.parse(response.bodyText);
+			this.msg = data["errors"][0]["title"];
+			this.has_msg = true;
 		}
 	}
 });

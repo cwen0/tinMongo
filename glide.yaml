@@ -1,9 +1,0 @@
-package: github.com/cwen0/tinMongo
-import:
-- package: github.com/GeertJohan/go.rice
-- package: github.com/Sirupsen/logrus
-- package: github.com/Unknwon/goconfig
-- package: github.com/gin-gonic/contrib
-  subpackages:
-  - sessions
-- package: github.com/gin-gonic/gin
