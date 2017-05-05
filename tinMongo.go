@@ -8,8 +8,10 @@ import (
 
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/Sirupsen/logrus"
+	"github.com/cwen0/tinMongo/middlewares"
 	"github.com/cwen0/tinMongo/router"
 	"github.com/cwen0/tinMongo/utils"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,8 +19,10 @@ func main() {
 	setLogger()
 	r := gin.Default()
 	setTemplate(r)
+	setSessions(r)
 
 	r.StaticFS("/public", http.Dir("public"))
+	r.Use(middlewares.SharedData())
 	router.SetRoutes(r)
 	r.Run(":3000")
 }
@@ -52,4 +56,9 @@ func setLogger() {
 	if gin.Mode() == gin.DebugMode {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
+}
+
+func setSessions(r *gin.Engine) {
+	store := sessions.NewCookieStore([]byte("tinMongo"))
+	r.Use(sessions.Sessions("tinMongo-session", store))
 }

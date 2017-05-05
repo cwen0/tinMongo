@@ -40,7 +40,7 @@ var login = new Vue({
             this.$http.post(this.loginUrl, this.item)
                 .then((response) => {
                 //router.redirect("/server/home")
-                location.href = "/home";
+                location.href = "/server/home";
             }).catch(this.requestError)
 		},
 		requestError: function(response) {

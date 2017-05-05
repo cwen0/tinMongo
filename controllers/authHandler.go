@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/cwen0/tinMongo/models"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +14,7 @@ func LoginGet(c *gin.Context) {
 }
 
 func LoginPost(c *gin.Context) {
+	session := sessions.Default(c)
 	auth := &models.Auth{}
 	var json = Wrapper{}
 	if err := c.BindJSON(auth); err != nil {
@@ -23,7 +25,7 @@ func LoginPost(c *gin.Context) {
 		c.JSON(http.StatusFound, json)
 		return
 	}
-	session, err := auth.Connect()
+	mgoSess, err := auth.Connect()
 	if err != nil {
 		json.Errors = &Errors{Error{
 			Status: http.StatusFound,
@@ -33,7 +35,9 @@ func LoginPost(c *gin.Context) {
 		c.JSON(http.StatusFound, json)
 		return
 	}
-	c.Set("mongo", session)
+	session.Set("mongo", mgoSess)
+
+	session.Save()
 	logrus.Info("Login sucess")
 	c.JSON(http.StatusOK, json)
 	return

@@ -1,6 +1,8 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func Home(c *gin.Context) {
 	c.HTML(200, "server/home", map[string]interface{}{})
