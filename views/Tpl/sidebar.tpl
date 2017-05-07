@@ -45,51 +45,23 @@
 <script type="text/javascript" src="/public/js/amazeui.tree.min.js"></script>
 <script type="text/javascript" src="/public/js/app.js"></script>
 <script>
-  // demo 1
-  var data = [
-    {
-      title: '<a href=\"/db/home\">苹果公司</a>',
-      type: 'folder',
-      products: [
-        {
-          title: 'iPhone',
-          type: 'item'
-        },
-        {
-          title: 'iMac',
-          type: 'item'
-        },
-        {
-          title: 'MacBook Pro',
-          type: 'item'
-        },
-        {
-          title: '<a href=\"#\">新建</a>',
-          type: 'item',
-          attr: {
-            icon:'am-icon-plus'
-          }
-        },
-      ]
-    },
-    {
-      title: '微软公司',
-      type: 'folder',
-      products: []
-    },
-    {
-      title: 'GitHub',
-      type: 'folder',
-      products: []
-    }
-  ];
 
+  var dbNames = {{.DBNames}};
+  var data = []; 
+  for (var i = 0; i < dbNames.length; i++) {
+      data.push({
+        title: dbNames[i],
+        type:"folder",
+        products: []
+      });
+  }
+  //console.log({{.ServerCmdLineOpts}})
   $('#firstTree').tree({
     dataSource: function(options, callback) {
       // 模拟异步加载
       setTimeout(function() {
         callback({data: options.products || data});
-      }, 400);
+      }, 200);
     },
     folderIcon:'database',
     itemIcon:'table',
@@ -98,5 +70,4 @@
     folderSelect: false
   });
 </script>
-
 {{end}}

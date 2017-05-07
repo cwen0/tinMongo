@@ -5,17 +5,22 @@
 {{set . "active" "home"}}
 <!-- content start -->
 
-  <div class="admin-content">
+  <div class="admin-content" id="home" >
   {{template "Tpl/navigation" .}}
   <div class="am-g am-g-fixed am-margin-top">
     <div class="am-panel am-panel-default">
     <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#command-line'}">
         <a href="">Command Line </a>(db.serverCmdLineOpts())<span class="am-icon-chevron-down am-fr" ></span></div>
       <div id="command-line" class="am-in">
-        <table class="am-table am-table-bd am-table-bdrs am-table-striped am-table-hover">
+        <table class="am-table am-table-bd am-table-bdrs">
           <tbody>
             <tr>
-              <td class="am-text-center">/usr/bin/mongod --config /etc/mongod.conf</td>
+              <td >
+                <pre><script>
+                      prettyJson({{ .ServerCmdLineOpts | marshal }});
+                  </script>
+                </pre>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -31,11 +36,11 @@
           <tbody>
             <tr>
               <td style="width:30%;">Host</td>
-              <td style="width:70%;">127.0.0.1</td>
+              <td style="width:70%;">{{.Connection.Host}}</td>
             </tr>
             <tr>
               <td>Port</td>
-              <td>27017</td>
+              <td>{{.Connection.Port}}</td>
             </tr>
             <tr>
               <td>Username</td>
@@ -58,12 +63,12 @@
         <table class="am-table am-table-bd am-table-bdrs am-table-striped am-table-hover">
           <tbody>
             <tr>
-              <td style="width:30%;">Golang 版本</td>
-              <td style="width:70%;">27017</td>
+              <td style="width:30%;">Git Hash</td>
+              <td style="width:70%;">{{.GitHash}}</td>
             </tr>
             <tr>
-              <td>Web server</td>
-              <td>TinMongo</td>
+              <td>Built Time</td>
+              <td>{{.BuildTS}}</td>
             </tr>
           </tbody>
         </table>
@@ -76,7 +81,19 @@
 </div>
 
 {{template "Tpl/footer" .}}
-
+<!-- <script type="text/javascript" src="/public/js/vue.js"></script>
+<script type="text/javascript">
+var serverHome = new Vue({
+  delimiters: ['${', '}'],
+  el: "#home",
+  data: {
+    serverCmdLineOpts: {{.ServerCmdLineOpts}}
+  },
+  filters: {
+    json: (value) => { return JSON.stringify(value, null, 2) },
+  }, 
+});
+</script> -->
 </body>
 </html>
 {{end}}

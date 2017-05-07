@@ -32,3 +32,17 @@
 .me-cap-cal-op-checkbox {
     padding-left: 38px;
 }
+
+
+pre {
+    margin: 0; 
+    border: 0px;
+    background-color: transparent;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }

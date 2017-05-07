@@ -34,7 +34,7 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if mongo, _ := c.Get("mongo"); mongo != nil {
+		if _, ok := c.Get("host"); ok {
 			c.Next()
 		} else {
 			logrus.Warnf("User not authorized to visit %s", c.Request.RequestURI)

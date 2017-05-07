@@ -4,7 +4,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/Sirupsen/logrus"
@@ -16,6 +18,7 @@ import (
 )
 
 func main() {
+	utils.PrintTinMongoInfo()
 	setLogger()
 	r := gin.Default()
 	setTemplate(r)
@@ -24,6 +27,20 @@ func main() {
 	r.StaticFS("/public", http.Dir("public"))
 	r.Use(middlewares.SharedData())
 	router.SetRoutes(r)
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+
+	go func() {
+		sig := <-sc
+		//		clearSessions()
+		logrus.Infof("Got signal [%d] to exit.", sig)
+		os.Exit(0)
+	}()
+
 	r.Run(":3000")
 }
 
@@ -62,3 +79,8 @@ func setSessions(r *gin.Engine) {
 	store := sessions.NewCookieStore([]byte("tinMongo"))
 	r.Use(sessions.Sessions("tinMongo-session", store))
 }
+
+//func clearSessions() {
+//session := sessions.Default()
+//session.Clear()
+//}

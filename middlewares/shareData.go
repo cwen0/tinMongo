@@ -9,10 +9,13 @@ import (
 func SharedData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
-		if mongo := session.Get("mongo"); mongo != nil {
-			c.Set("mongo", mongo)
+		if host := session.Get("host"); host != nil {
+			c.Set("host", host)
 		}
-		c.Set("mongo", "m")
+
+		if port := session.Get("port"); port != nil {
+			c.Set("port", port)
+		}
 		c.Next()
 	}
 }
