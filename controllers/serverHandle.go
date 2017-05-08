@@ -108,7 +108,7 @@ func Databases(c *gin.Context) {
 		}
 		status["StorageSize"] = result["storageSize"]
 		status["IndexSize"] = result["indexSize"]
-		status["Indexs"] = result["indexs"]
+		status["Indexes"] = result["indexes"]
 		status["Objects"] = result["objects"]
 		status["Collections"] = result["collections"]
 		dbsStatus = append(dbsStatus, status)

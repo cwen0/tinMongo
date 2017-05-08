@@ -41,12 +41,6 @@ func Marshal(v interface{}) template.JS {
 }
 
 func Humanize(v interface{}) interface{} {
-	//val, ok := v.(uint64)
-	//if !ok {
-	//logrus.Errorf("Format Humanize failed: %v", v)
-	//return v
-	//}
-	//	return humanize.Bytes(val)
 	switch val := v.(type) {
 	case uint32:
 		return humanize.Bytes(uint64(val))
