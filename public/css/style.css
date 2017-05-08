@@ -33,6 +33,24 @@
     padding-left: 38px;
 }
 
+.me-modal {
+    top: 20%;
+}
+
+.me-label {
+    float:left;
+}
+
+.me-modal-bd {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.me-panel {
+    text-align: left;
+    background-color: #f5f5f5;
+}
+
 
 pre {
     margin: 0; 

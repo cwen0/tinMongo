@@ -44,7 +44,7 @@ var login = new Vue({
             }).catch(this.requestError)
 		},
 		requestError: function(response) {
-			console.log(response);
+			//console.log(response);
 			data = JSON.parse(response.bodyText);
 			this.msg = data["errors"][0]["title"];
 			this.has_msg = true;

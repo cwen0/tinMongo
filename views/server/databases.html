@@ -5,11 +5,9 @@
 {{set . "active" "databases"}}
   <div class="admin-content">
   {{template "Tpl/navigation" .}}
-
-
       <div class="am-g am-g-fixed am-margin-top">
           <div >
-              <a href=""><i class="am-icon-plus"></i>创建数据库</a>
+              <a href="#" type="button"  id="add_database_btn" ><i class="am-icon-plus"></i>创建数据库</a>
           </div>
         <div class="am-panel am-panel-default">
         <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#databases-info'}">数据库 <span class="am-icon-chevron-down am-fr" ></span></div>
@@ -45,8 +43,93 @@
       </div>
   </div>
 </div>
+<div class="me-modal am-modal" tabindex="-1" id="add_database">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">Create Database
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="me-modal-bd am-modal-bd">
+      <div  class="am-form">
+           <div class="am-form-group">
+              <label class="me-label">Database Name</label>
+              <input type="text" id="new_database_name" >
+          </div>
+           <div class="am-form-group">
+              <label class="me-label" >Collection Name</label>
+              <input type="text" id="new_collection_name" >
+          </div>
+      </div>
+       <div class="me-panel am-panel am-panel-default">
+        <div class="am-panel-bd">
+          <p>Before MongoDB can save your new database, a collection name must also be specified at the time of creation. <a href="https://docs.mongodb.com/manual/faq/fundamentals/#how-do-i-create-a-database-and-a-collection">More Information</a> </p>
+        </div>
+      </div>
+    <div class="am-alert a am-alert-warning" id="alert_msg" >
+      <button type="button" class="am-close">&times;</button>
+      <p> </p>
+    </div>
+    </div>
+       <div class="am-modal-footer">
+      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+      <span id="my_confirm" class="am-modal-btn" data-am-modal-confirm >确定</span>
+    </div>
+  </div>
+</div>
   {{template "Tpl/footer" .}}
+ <!--  <script type="text/javascript" src="/public/js/vue.js"></script> 
+  <script type="text/javascript" src="/public/js/vue-resource.js"></script> -->
+  <script type="text/javascript" >
+  (function(){
+     var dom = {
+       alert_msg: $("#alert_msg")
+     }
 
+     dom.alert_msg.hide();
+
+     dom.alert_msg.find("button").on('click', function() {
+        dom.alert_msg.hide();
+     });
+    
+     $('#add_database_btn').on('click', function() {
+          var $promt = $('#add_database').modal({
+            relatedTarget: this,
+            closeOnConfirm: false,
+            closeOnCancel: true,
+            onConfirm: function(e) {
+                databaseName = $("#new_database_name").val();
+                collectionName = $("#new_collection_name").val();
+                if(databaseName.length  < 1) {
+                    dom.alert_msg.find("p").text("Database Name is required!!");
+                    dom.alert_msg.show();
+                    return 
+                }
+                if(collectionName.length < 1 ) {
+                    dom.alert_msg.find("p").text("Collection Name is required!!");
+                    dom.alert_msg.show();
+                    return 
+                }
+                $.ajax({
+                    url : "/server/createDatabase",
+                    data : {
+                        databaseName: databaseName, 
+                        collectionName: collectionName
+                    },
+                    dataType : "json",
+                    type : "post",
+                    success : function(data) {
+                      $('#add_database').modal('close');
+                      location.reload();
+                    },
+                    error : function(response) {
+                      data = JSON.parse(response.bodyText);
+                      dom.alert_msg.find("p").text(data["errors"][0]["title"]);
+                    }
+                  });
+              }
+            });
+        });
+  })();
+  </script>
   </body>
   </html>
 {{end}}

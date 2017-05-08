@@ -3,9 +3,11 @@ package utils
 import (
 	"encoding/json"
 	"html/template"
+	"net/http"
 	"reflect"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/cwen0/tinMongo/models"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 )
@@ -27,11 +29,25 @@ func Equal(args ...interface{}) bool {
 }
 
 func DefaultH(c *gin.Context) gin.H {
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return nil
+	}
+	defer mongo.Close()
+	dbNames, err := mongo.DatabaseNames()
+	if err != nil {
+		logrus.Errorf("Get mongo database names failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return nil
+	}
 	host, _ := c.Get("host")
 	port, _ := c.Get("port")
 	return gin.H{
-		"Host": host,
-		"Port": port,
+		"Host":    host,
+		"Port":    port,
+		"DBNames": dbNames,
 	}
 }
 

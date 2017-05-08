@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -19,12 +20,7 @@ func Home(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
-	dbNames, err := mongo.DatabaseNames()
-	if err != nil {
-		logrus.Errorf("Get mongo database names failed: %v", err)
-		c.HTML(http.StatusInternalServerError, "errors/500", nil)
-		return
-	}
+	defer mongo.Close()
 	cmdLineOpts := bson.M{}
 	if err = mongo.Run(bson.D{{"getCmdLineOpts", 1}}, &cmdLineOpts); err != nil {
 		logrus.Errorf("Get mongo serverCmdLineOpts failed: %v", err)
@@ -46,7 +42,6 @@ func Home(c *gin.Context) {
 		connection["Port"] = port
 	}
 	h := utils.DefaultH(c)
-	h["DBNames"] = dbNames
 	h["ServerCmdLineOpts"] = cmdLineOpts
 	h["BuildInfo"] = buildInfo
 	h["Connection"] = connection
@@ -63,6 +58,7 @@ func Status(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	ServerStatus := bson.M{}
 	if err = mongo.Run(bson.D{{"serverStatus", 1}}, &ServerStatus); err != nil {
 		logrus.Errorf("Get mongo serverStatus failed: %v", err)
@@ -81,6 +77,7 @@ func Databases(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	dbNames, err := mongo.DatabaseNames()
 	if err != nil {
 		logrus.Errorf("Get mongo database names failed: %v", err)
@@ -116,6 +113,45 @@ func Databases(c *gin.Context) {
 	h := utils.DefaultH(c)
 	h["DBsStatus"] = dbsStatus
 	c.HTML(200, "server/databases", h)
+}
+
+func CreateDatabase(c *gin.Context) {
+	mongo, err := models.GetMongo()
+	response := Wrapper{}
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+	}
+	dbName := strings.TrimSpace(c.PostForm("databaseName"))
+	collectionName := strings.TrimSpace(c.PostForm("collectionName"))
+	if dbName == "" || collectionName == "" {
+		logrus.Error("CreateDatabase: form data is not correctly!")
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  "Please, fill out form correctly!",
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	db := mongo.DB(dbName)
+	err = db.Run(bson.D{{"create", collectionName}}, nil)
+	if err != nil {
+		logrus.Error("create %s:%s failed, DB: %v", dbName, collectionName, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("create %s:%s failed, DB: %v", dbName, collectionName, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	logrus.Infof("Create %s:%s sucess", dbName, collectionName)
+	c.JSON(http.StatusOK, response)
+}
+
+func DeleteDatabase(c *gin.Context) {
 }
 
 func ProcessList(c *gin.Context) {
