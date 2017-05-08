@@ -69,16 +69,53 @@ func Status(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
-	//for v, _ := range ServerStatus {
-	//fmt.Println(v)
-	//}
 	h := utils.DefaultH(c)
 	h["ServerStatus"] = ServerStatus
 	c.HTML(200, "server/status", h)
 }
 
 func Databases(c *gin.Context) {
-	c.HTML(200, "server/databases", map[string]interface{}{})
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	dbNames, err := mongo.DatabaseNames()
+	if err != nil {
+		logrus.Errorf("Get mongo database names failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	dbsStatus := make([]map[string]interface{}, 0)
+	for _, name := range dbNames {
+		status := make(map[string]interface{})
+		db := mongo.DB(name)
+		result := bson.M{}
+		if err = db.Run(bson.D{{"dbstats", 1}}, &result); err != nil {
+			logrus.Errorf("Get %d Status failed: %v", name, err)
+			c.HTML(http.StatusInternalServerError, "errors/500", nil)
+			return
+		}
+		status["Name"] = name
+		status["DiskSize"] = "-"
+		status["DataSize"] = "-"
+		if v, ok := result["sizeOnDisk"]; ok {
+			status["DiskSize"] = v
+		}
+		if v, ok := result["dataSize"]; ok {
+			status["DataSize"] = v
+		}
+		status["StorageSize"] = result["storageSize"]
+		status["IndexSize"] = result["indexSize"]
+		status["Indexs"] = result["indexs"]
+		status["Objects"] = result["objects"]
+		status["Collections"] = result["collections"]
+		dbsStatus = append(dbsStatus, status)
+	}
+	h := utils.DefaultH(c)
+	h["DBsStatus"] = dbsStatus
+	c.HTML(200, "server/databases", h)
 }
 
 func ProcessList(c *gin.Context) {

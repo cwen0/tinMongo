@@ -20,14 +20,24 @@
                 <th>Size</th>
                 <th>Storage Size</th>
                 <th>Data Size</th>
+                <th>Indexs</th>
                 <th>Index Size</th>
                 <th>Collections </th>
                 <th>Objects</th>
             </thead>
               <tbody>
-                <tr>
-
-                </tr>
+                  {{ range  $db := .DBsStatus }} 
+                    <tr>
+                      <td>{{ $db.Name }}</td>
+                      <td>{{ $db.DiskSize | humanize }}</td>
+                      <td>{{ $db.StorageSize | humanize  }}</td>
+                      <td>{{ $db.DataSize | humanize }}</td>
+                      <td>{{ $db.Indexs }}</td>
+                      <td>{{ $db.IndexSize | humanize }}</td>
+                      <td>{{ $db.Collections }}</td>
+                      <td>{{ $db.Objects }}</td>
+                    </tr>
+                  {{ end }}
               </tbody>
             </table>
           </div>

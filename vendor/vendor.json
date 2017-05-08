@@ -45,6 +45,12 @@
 			"revisionTime": "2015-03-29T02:31:25Z"
 		},
 		{
+			"checksumSHA1": "CsjSfTWLKyKNkhmSEhwXjup3gsI=",
+			"path": "github.com/dustin/go-humanize",
+			"revision": "259d2a102b871d17f30e3cd9881a642961a1e486",
+			"revisionTime": "2017-02-28T07:34:54Z"
+		},
+		{
 			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
 			"path": "github.com/garyburd/redigo/internal",
 			"revision": "ac91d6ff49bd0d278a90201de77a4f8ad9628e25",
