@@ -136,6 +136,7 @@ func CreateDatabase(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	defer mongo.Clone()
 	db := mongo.DB(dbName)
 	err = db.Run(bson.D{{"create", collectionName}}, nil)
 	if err != nil {
@@ -161,6 +162,7 @@ func DeleteDatabase(c *gin.Context) {
 			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
 		}}
 	}
+	defer mongo.Close()
 	dbName := strings.TrimSpace(c.Param("dbName"))
 	db := mongo.DB(dbName)
 	err = db.DropDatabase()
@@ -177,7 +179,22 @@ func DeleteDatabase(c *gin.Context) {
 }
 
 func ProcessList(c *gin.Context) {
-	c.HTML(200, "server/processList", map[string]interface{}{})
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	defer mongo.Close()
+	result := bson.M{}
+	if err = mongo.Run(bson.D{{"currentOp", 1}, {"$all", 1}}, &result); err != nil {
+		logrus.Errorf("Get ProcessList failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	h := utils.DefaultH(c)
+	h["ProcessList"] = result["inprog"]
+	c.HTML(200, "server/processList", h)
 }
 
 func Command(c *gin.Context) {
