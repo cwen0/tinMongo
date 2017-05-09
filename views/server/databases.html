@@ -34,6 +34,12 @@
                       <td>{{ $db.IndexSize | humanize }}</td>
                       <td>{{ $db.Collections }}</td>
                       <td>{{ $db.Objects }}</td>
+                      <td>
+                        <a href="#" >
+                          <i class="am-icon-trash am-icon-fw"></i>
+                          <input  type="hidden" value="{{ $db.Name }}" >
+                        </a>
+                      </td>
                     </tr>
                   {{ end }}
               </tbody>
@@ -43,45 +49,67 @@
       </div>
   </div>
 </div>
-<div class="me-modal am-modal" tabindex="-1" id="add_database">
+<div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="delete_database" aria-hidden="true" >
   <div class="am-modal-dialog">
-    <div class="am-modal-hd">Create Database
-      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
-    </div>
-    <div class="me-modal-bd am-modal-bd">
-      <div  class="am-form">
-           <div class="am-form-group">
-              <label class="me-label">Database Name</label>
-              <input type="text" id="new_database_name" >
-          </div>
-           <div class="am-form-group">
-              <label class="me-label" >Collection Name</label>
-              <input type="text" id="new_collection_name" >
-          </div>
+    <div class="am-modal-hd">Delete Database</div>
+    <div class="am-modal-bd">
+       <i class="am-icon-warning am-icon-fw" ></i>Type the database name local to drop
+      <input type="text" class="am-modal-prompt-input" id="delete_database_input">
+
+      <div class="am-alert a am-alert-warning" id="del_alert_msg" >
+          <button type="button" class="am-close">&times;</button>
+          <p> </p>
       </div>
-       <div class="me-panel am-panel am-panel-default">
-        <div class="am-panel-bd">
-          <p>Before MongoDB can save your new database, a collection name must also be specified at the time of creation. <a href="https://docs.mongodb.com/manual/faq/fundamentals/#how-do-i-create-a-database-and-a-collection">More Information</a> </p>
-        </div>
-      </div>
-    <div class="am-alert a am-alert-warning" id="alert_msg" >
-      <button type="button" class="am-close">&times;</button>
-      <p> </p>
     </div>
-    </div>
-       <div class="am-modal-footer">
+    <div class="am-modal-footer">
       <span class="am-modal-btn" data-am-modal-cancel>取消</span>
-      <span id="my_confirm" class="am-modal-btn" data-am-modal-confirm >确定</span>
+      <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="delete_database_confirm">提交</span>
     </div>
   </div>
 </div>
+<div class="me-modal am-modal" tabindex="-1" id="add_database">
+  <div class="am-modal-dialog">
+      <div class="am-modal-hd">Create Database
+        <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+      </div>
+        <div class="me-modal-bd am-modal-bd">
+          <div  class="am-form">
+               <div class="am-form-group">
+                  <label class="me-label">Database Name</label>
+                  <input type="text" id="new_database_name" >
+              </div>
+               <div class="am-form-group">
+                  <label class="me-label" >Collection Name</label>
+                  <input type="text" id="new_collection_name" >
+              </div>
+          </div>
+         <div class="me-panel am-panel am-panel-default">
+            <div class="am-panel-bd">
+              <p>Before MongoDB can save your new database, a collection name must also be specified at the time of creation. <a href="https://docs.mongodb.com/manual/faq/fundamentals/#how-do-i-create-a-database-and-a-collection">More Information</a> </p>
+            </div>
+          </div>
+        <div class="am-alert a am-alert-warning" id="alert_msg" >
+          <button type="button" class="am-close">&times;</button>
+          <p> </p>
+        </div>
+        </div>
+        <div class="am-modal-footer">
+          <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+          <span id="my_confirm" class="am-modal-btn" data-am-modal-confirm >确定</span>
+        </div>
+      </div>
+    </div>
+
+
   {{template "Tpl/footer" .}}
- <!--  <script type="text/javascript" src="/public/js/vue.js"></script> 
-  <script type="text/javascript" src="/public/js/vue-resource.js"></script> -->
   <script type="text/javascript" >
-  (function(){
+  (function(){ 
      var dom = {
-       alert_msg: $("#alert_msg")
+       alert_msg: $("#alert_msg"), 
+       del_alert_msg: $("#del_alert_msg"),
+       delete_database_btn: $(".am-icon-trash"),
+       delete_database_input: $("#delete_database").find(".am-modal-prompt-input"),
+       delete_database_confirm: $("#delete_database_confirm")
      }
 
      dom.alert_msg.hide();
@@ -89,6 +117,65 @@
      dom.alert_msg.find("button").on('click', function() {
         dom.alert_msg.hide();
      });
+     var true_delete_database = "";
+     var can_del = false;
+     var del = {
+
+        init: function() {
+          this.eventFn();
+        }, 
+        eventFn: function() {
+          dom.delete_database_btn.on("click", function() {
+              dom.del_alert_msg.hide();
+              $("#delete_database").modal({
+                  open: true,
+                  relatedTarget: this,
+                  closeOnConfirm:false,
+              });
+              dom.delete_database_input.val("");
+              $("#delete_database").find(".data-am-modal-confirm").css('background-color', '#f2f2f2');
+              true_delete_database = $(this).next().val();
+          })
+
+          dom.delete_database_input.on("change input propertychange blur", function() {
+             modal_val = dom.delete_database_input.val();
+             if(modal_val == true_delete_database) {
+               $("#delete_database").find(".data-am-modal-confirm").css("background-color", "");
+                can_del = true;
+             }else {
+                can_del = false;
+             }
+          })
+
+          dom.delete_database_confirm.on("click", function(){
+            if(can_del == false) {
+              return
+            }
+            if(true_delete_database.length < 1) {
+                dom.del_alert_msg.find("p").text("Database Name is required!!");
+                dom.del_alert_msg.show();
+                return 
+            }
+            $.ajax({
+              url : "/server/database" + "/" + true_delete_database + "/delete",
+              type : "post",
+              success : function(data) {
+                $('#delete_database').modal('close');
+                location.reload();
+              },
+              error : function(response) {
+                data = JSON.parse(response.bodyText);
+                dom.del_alert_msg.find("p").text(data["errors"][0]["title"]);
+              }
+            });
+         })
+
+
+        }
+     }
+
+     del.init();
+
     
      $('#add_database_btn').on('click', function() {
           var $promt = $('#add_database').modal({
@@ -109,7 +196,7 @@
                     return 
                 }
                 $.ajax({
-                    url : "/server/createDatabase",
+                    url : "/server/newDatabase",
                     data : {
                         databaseName: databaseName, 
                         collectionName: collectionName
@@ -123,6 +210,7 @@
                     error : function(response) {
                       data = JSON.parse(response.bodyText);
                       dom.alert_msg.find("p").text(data["errors"][0]["title"]);
+                      dom.alert_msg.show();
                     }
                   });
               }

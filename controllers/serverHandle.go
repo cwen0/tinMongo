@@ -116,8 +116,8 @@ func Databases(c *gin.Context) {
 }
 
 func CreateDatabase(c *gin.Context) {
-	mongo, err := models.GetMongo()
 	response := Wrapper{}
+	mongo, err := models.GetMongo()
 	if err != nil {
 		logrus.Errorf("Get mongo session failed: %v", err)
 		response.Errors = &Errors{Error{
@@ -139,19 +139,41 @@ func CreateDatabase(c *gin.Context) {
 	db := mongo.DB(dbName)
 	err = db.Run(bson.D{{"create", collectionName}}, nil)
 	if err != nil {
-		logrus.Error("create %s:%s failed, DB: %v", dbName, collectionName, err)
+		logrus.Error("Create database:collection [%s:%s] failed, DB: %v", dbName, collectionName, err)
 		response.Errors = &Errors{Error{
 			Status: http.StatusInternalServerError,
-			Title:  fmt.Sprintf("create %s:%s failed, DB: %v", dbName, collectionName, err),
+			Title:  fmt.Sprintf("Create database:collection [%s:%s] failed, DB: %v", dbName, collectionName, err),
 		}}
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
-	logrus.Infof("Create %s:%s sucess", dbName, collectionName)
+	logrus.Infof("Create database:collection [%s:%s] success", dbName, collectionName)
 	c.JSON(http.StatusOK, response)
 }
 
 func DeleteDatabase(c *gin.Context) {
+	response := Wrapper{}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+	}
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	db := mongo.DB(dbName)
+	err = db.DropDatabase()
+	if err != nil {
+		logrus.Error("Drop database [%s] failed: %v", dbName, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Drop database [%s] failed: %v", dbName, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+	}
+	logrus.Infof("Drop database [%s] success", dbName)
+	c.JSON(http.StatusOK, response)
 }
 
 func ProcessList(c *gin.Context) {
