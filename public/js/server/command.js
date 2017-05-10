@@ -19,11 +19,13 @@ var command = new Vue({
 	methods: {
 		execAction: function() {
 			if(this.item.command == "")  {
+				this.show_result = false;
 				this.has_msg = true;
 				this.alert_msg = "Command is required!!";
 				return;
 			}
 			if(this.item.dbName == "") {
+				this.show_result = false;
 			    this.has_msg = true;
                 this.alert_msg = "Database is required!!";
                 return;
@@ -41,6 +43,7 @@ var command = new Vue({
             data = JSON.parse(response.bodyText);
             this.alert_msg = data["errors"][0]["title"];
             this.has_msg = true;
+            this.show_result = false;
         }
 	}
 })
