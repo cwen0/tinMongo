@@ -36,6 +36,7 @@ var command = new Vue({
             	this.result = data["datas"][0]["context"];
             	console.log(data);
             	console.log(this.result);
+            	this.has_msg = false;
             	this.show_result = true;
             }).catch(this.requestError)
 		},
