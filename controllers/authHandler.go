@@ -19,6 +19,7 @@ func LoginPost(c *gin.Context) {
 	auth := &models.Auth{}
 	response := Wrapper{}
 	if err := c.BindJSON(auth); err != nil {
+		logrus.Errorf("BindJSON failed: %v", err)
 		response.Errors = &Errors{Error{
 			Status: http.StatusBadRequest,
 			Title:  "Please, fill out form correctly!!",

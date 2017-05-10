@@ -11,11 +11,12 @@ var login = new Vue({
 			hostname: "localhost",
 			port: 27017, 
 			database: "admin",
+			isAuth: 0 ,
 		},
 		loginUrl: "/login"
 	},
 	filters: {
-		json: (value) => { return JSON.stringify(value, null, 2) }
+		json: (value) => { return JSON.stringify(value, null, 4) }
 	}, 
 	watch: {
 		selected: function(val) {
@@ -27,16 +28,20 @@ var login = new Vue({
 			if(this.selected == 1 ) {
 				if(this.item.username == null) {
 					this.has_msg = true; 
-					this.msg = "Username is required! "			
-					return 
+					this.msg = "Username is required! "	;		
+					return ;
 				}
-				if(this.item.password == null ) {
+				if(this.item.password == null) {
 					this.has_msg = true; 
-					this.msg = "Password is required! "	
-					return 
+					this.msg = "Password is required! "	;
+					return ;
 				}
 			}
-			
+			if(this.selected == "1") {
+				this.item.isAuth = 1;
+			} else {
+				this.item.isAuth = 0;
+			}
             this.$http.post(this.loginUrl, this.item)
                 .then((response) => {
                 //router.redirect("/server/home")

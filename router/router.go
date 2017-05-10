@@ -21,6 +21,7 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.POST("/database/:dbName/delete", controllers.DeleteDatabase)
 		authorized.GET("/processList", controllers.ProcessList)
 		authorized.GET("/command", controllers.Command)
+		authorized.POST("/command", controllers.ExecCommand)
 		authorized.GET("/execute", controllers.Execute)
 		authorized.GET("/replication", controllers.Replication)
 

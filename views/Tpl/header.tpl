@@ -16,6 +16,5 @@
   <link rel="stylesheet" href="/public/css/admin.css">
   <link rel="stylesheet" href="/public/css/style.css">
 </head>
-
 <body>
 {{end}}

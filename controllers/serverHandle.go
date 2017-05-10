@@ -42,6 +42,9 @@ func Home(c *gin.Context) {
 		connection["Port"] = port
 	}
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
 	h["ServerCmdLineOpts"] = cmdLineOpts
 	h["BuildInfo"] = buildInfo
 	h["Connection"] = connection
@@ -66,6 +69,9 @@ func Status(c *gin.Context) {
 		return
 	}
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
 	h["ServerStatus"] = ServerStatus
 	c.HTML(200, "server/status", h)
 }
@@ -111,6 +117,9 @@ func Databases(c *gin.Context) {
 		dbsStatus = append(dbsStatus, status)
 	}
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
 	h["DBsStatus"] = dbsStatus
 	c.HTML(200, "server/databases", h)
 }
@@ -193,12 +202,85 @@ func ProcessList(c *gin.Context) {
 		return
 	}
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
 	h["ProcessList"] = result["inprog"]
 	c.HTML(200, "server/processList", h)
 }
 
 func Command(c *gin.Context) {
-	c.HTML(200, "server/command", map[string]interface{}{})
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	c.HTML(200, "server/command", h)
+}
+
+func ExecCommand(c *gin.Context) {
+	response := Wrapper{}
+	cmd := struct {
+		Command string `json:"command"`
+		DBName  string `json:"dbName"`
+		// 	Format  string `json:"fotmat"`
+	}{}
+	if err := c.BindJSON(&cmd); err != nil {
+		logrus.Errorf("ExecCommand bad required: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	if cmd.Command == "" || cmd.DBName == "" {
+		logrus.Error("ExecCommand: form data is not corrrent")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var cmdBson interface{}
+	if err := bson.UnmarshalJSON([]byte(cmd.Command), &cmdBson); err != nil {
+		logrus.Errorf("UnmarshalJSON %s failed: %v", cmd.Command, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("UnmarshalJSON %s failed: %v", cmd.Command, err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	fmt.Println(cmdBson)
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(cmd.DBName)
+	result := bson.M{}
+	if err := db.Run(cmdBson, &result); err != nil {
+		logrus.Errorf("Run command [%v] failed: %v", cmd.Command, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Run command [%v] failed: %v", cmd.Command, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response.Datas = &Datas{Data{
+		Type:    "json",
+		Context: result,
+	}}
+	c.JSON(http.StatusOK, response)
 }
 
 func Execute(c *gin.Context) {
