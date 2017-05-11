@@ -284,7 +284,57 @@ func ExecCommand(c *gin.Context) {
 }
 
 func Execute(c *gin.Context) {
-	c.HTML(200, "server/execute", map[string]interface{}{})
+	h := utils.DefaultH(c)
+	c.HTML(200, "server/execute", h)
+}
+
+func DoExecute(c *gin.Context) {
+	response := Wrapper{}
+	cmd := struct {
+		Code   string        `form:"code" json:"code"`
+		DBName string        `form:"dbName" json:"dbName"`
+		Argus  []interface{} `from:"argus" json:"argus"`
+	}{}
+	if err := c.Bind(&cmd); err != nil {
+		logrus.Errorf("DoExecute bad required: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	jscript := &bson.JavaScript{
+		Code:  cmd.Code,
+		Scope: cmd.Argus,
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(cmd.DBName)
+	result := bson.M{}
+	if err := db.Run(jscript, &result); err != nil {
+		logrus.Errorf("Run JavaScript[%v] failed: %v", jscript, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Run JavaScript[%v] failed: %v", jscript, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response.Datas = &Datas{Data{
+		Type:    "json",
+		Context: result,
+	}}
+	c.JSON(http.StatusOK, response)
 }
 
 func Replication(c *gin.Context) {

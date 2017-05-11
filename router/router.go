@@ -23,6 +23,7 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.GET("/command", controllers.Command)
 		authorized.POST("/command", controllers.ExecCommand)
 		authorized.GET("/execute", controllers.Execute)
+		authorized.POST("/execute", controllers.DoExecute)
 		authorized.GET("/replication", controllers.Replication)
 
 		authorized.GET("/db/home", controllers.DbHome)

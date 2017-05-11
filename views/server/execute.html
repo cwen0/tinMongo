@@ -9,19 +9,19 @@
 
       <div class="am-g am-g-fixed am-margin-top">
           <div >
-              <a href=""><i class="am-icon-angle-double-right"></i>&nbsp;&nbsp; Javascript API   </a>
+              <a href="http://api.mongodb.org/js/" target="_blank" ><i class="am-icon-angle-double-right"></i>&nbsp;&nbsp; Javascript API   </a>
           </div>
           <form class="am-form">
               <fieldset>
                   <div class="am-form-group" id="divCode">
-                      <textarea class="" rows="14" id="code"></textarea>
+                      <textarea class="" rows="14" id="code" name="code" ></textarea>
                   </div>
                   <div class="am-form-group" id="divDatabase">
                        <label for="Database">Database:</label>
-                       <select id="Database">
-                         <option value="option1">Admin</option>
-                         <option value="option2">Admin</option>
-                         <option value="option3">Admin</option>
+                       <select id="Database" name="dbName">
+                         {{ range $db := .DBNames }}
+                          <option value="{{ $db }}"> {{ $db }} </option>
+                        {{ end }}
                        </select>
                        <span class="am-form-caret"></span>
                  </div>
@@ -31,13 +31,28 @@
                       <button type="button" class="am-btn am-btn-default" id="argumentAdd"><i class="am-icon-plus"></i>Add</button>
                       <span class="am-form-caret"></span>
                     </div>
-
+                    <div class="am-alert a am-alert-warning" id = "alert_msg" style="display: none" >
+                    <button type="button"  class="am-close" id="alert_msg_close" >&times;</button>
+                    <p></p>
+                  </div>
                     <div class="am-form-group">
-                        <button type="button" class="am-btn am-btn-default am-btn-block">执行代码</button>
+                        <button type="button" class="am-btn am-btn-default am-btn-block" id="submit_btn">执行代码</button>
                     </div>
                 </fieldset>
           </form>
 
+        </div>
+        <div class="am-g am-g-fixed am-margin-top" >
+          <fieldset>
+            <div class="me-result-panel am-panel am-panel-default" style="display: none" id="exec_result">
+                  <div class="me-result-panel am-panel am-panel-default" >
+                    <div class="am-panel-hd">执行结果</div>
+                    <div class="am-panel-bd">
+                      <pre></pre>
+                    </div>
+                  </div>
+              </div>
+            </fieldset>
         </div>
     </div>
 </div>
@@ -48,7 +63,11 @@
     argumentAdd : $("#argumentAdd"),
     divCode : $("#divCode"),
     divDatabase : $("#divDatabase"),
-    arguments : $("#arguments")
+    arguments : $("#arguments"), 
+    submit_btn: $("#submit_btn"),
+    alert_msg: $("#alert_msg"), 
+    exec_result: $("#exec_result"),
+    alert_msg_close: $("#alert_msg_close")
   }
 
   var argument = {
@@ -58,10 +77,58 @@
      eventFn : function() {
           dom.argumentAdd.bind('click',function() {
             var no = dom.arguments.children("div").length;
-            var divArgument = "<div class=\"am-form-group\">Argument #<span>" + no +  "</span>[JSON]  &nbsp;&nbsp;<a href=\"#\" onclick=\"removeArgument(this);return false;\" >Remove</a><textarea rows=\"4\"></textarea></div>"
+            var divArgument = "<div class=\"am-form-group\">Argument #<span>" + no +  "</span>[JSON]  &nbsp;&nbsp;<a href=\"#\" onclick=\"removeArgument(this);return false;\" >Remove</a><textarea rows=\"4\" name=\"argu\" ></textarea></div>"
               dom.arguments.append(divArgument);
           });
 
+          dom.submit_btn.bind('click', function() {
+            code = $('textarea[name="code"]').val();
+            dbName = $('select[name="dbName"]').val();
+            dom.exec_result.hide();
+            var argus = [];
+            $('textarea[name="argu"]').each(function(){
+              var text = $(this).val();
+              argus.push(text);
+            });
+            if(code == "" ) {
+              dom.alert_msg.find("p").text("Javascript code is required!!");
+              dom.alert_msg.show();
+              return;
+            }
+            if(dbName == "") {
+              dom.alert_msg.find("p").text("Database is required!!");
+              dom.alert_msg.show();
+              return;
+            }
+            // dom.alert_msg.hide();
+            $.ajax({
+              url: "/server/execute", 
+              data: {
+                code: code, 
+                dbName: dbName, 
+                argus: argus
+              }, 
+              dataType: "json", 
+              type: "post", 
+              success: function(response) {
+                data= JSON.parse(response.bodyText);
+                result = data["datas"][0]["context"];
+                dom.exec_result.find("pre").text(result);
+                dom.exec_result.show();
+                dom.alert_msg.hide();
+              }, 
+              error: function(response) {
+                //console.log(response);
+                data = JSON.parse(response.responseText);
+                dom.alert_msg.find("p").text(data["errors"][0]["title"]);
+                dom.alert_msg.show();
+              }
+            });
+          }); 
+
+          dom.alert_msg_close.bind('click', function() {
+              dom.alert_msg.hide();
+          }); 
      }
   }
 
