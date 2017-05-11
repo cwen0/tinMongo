@@ -25,12 +25,12 @@
                        </select>
                        <span class="am-form-caret"></span>
                  </div>
-                 <div id="arguments"></div>
+<!--                  <div id="arguments"></div>
                  <div class="am-form-group">
                       <label for="Format">Argument:</label>
                       <button type="button" class="am-btn am-btn-default" id="argumentAdd"><i class="am-icon-plus"></i>Add</button>
                       <span class="am-form-caret"></span>
-                    </div>
+                    </div> -->
                     <div class="am-alert a am-alert-warning" id = "alert_msg" style="display: none" >
                     <button type="button"  class="am-close" id="alert_msg_close" >&times;</button>
                     <p></p>
@@ -111,8 +111,10 @@
               dataType: "json", 
               type: "post", 
               success: function(response) {
-                data= JSON.parse(response.bodyText);
-                result = data["datas"][0]["context"];
+                console.log(response);
+                //data = JSON.parse(response);
+                data = JSON.stringify(response["datas"][0]["context"], undefined, 4);
+                result = data;
                 dom.exec_result.find("pre").text(result);
                 dom.exec_result.show();
                 dom.alert_msg.hide();

@@ -15,7 +15,11 @@
 
               <tbody>
                 <tr>
-
+                  <td>
+                    <pre><script>
+                      prettyJson({{ .ReplicationInfo | marshal }})
+                    </script></pre>
+                  </td>
                 </tr>
               </tbody>
             </table>

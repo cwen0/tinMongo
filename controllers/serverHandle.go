@@ -285,15 +285,18 @@ func ExecCommand(c *gin.Context) {
 
 func Execute(c *gin.Context) {
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
 	c.HTML(200, "server/execute", h)
 }
 
 func DoExecute(c *gin.Context) {
 	response := Wrapper{}
 	cmd := struct {
-		Code   string        `form:"code" json:"code"`
-		DBName string        `form:"dbName" json:"dbName"`
-		Argus  []interface{} `from:"argus" json:"argus"`
+		Code   string `form:"code" json:"code"`
+		DBName string `form:"dbName" json:"dbName"`
+		Argus  string `from:"argus" json:"argus"`
 	}{}
 	if err := c.Bind(&cmd); err != nil {
 		logrus.Errorf("DoExecute bad required: %v", err)
@@ -303,10 +306,6 @@ func DoExecute(c *gin.Context) {
 		}}
 		c.JSON(http.StatusBadRequest, response)
 		return
-	}
-	jscript := &bson.JavaScript{
-		Code:  cmd.Code,
-		Scope: cmd.Argus,
 	}
 	mongo, err := models.GetMongo()
 	if err != nil {
@@ -321,11 +320,11 @@ func DoExecute(c *gin.Context) {
 	defer mongo.Close()
 	db := mongo.DB(cmd.DBName)
 	result := bson.M{}
-	if err := db.Run(jscript, &result); err != nil {
-		logrus.Errorf("Run JavaScript[%v] failed: %v", jscript, err)
+	if err := db.Run(bson.M{"eval": cmd.Code}, &result); err != nil {
+		logrus.Errorf("Run JavaScript[%v] failed: %v", cmd.Code, err)
 		response.Errors = &Errors{Error{
 			Status: http.StatusInternalServerError,
-			Title:  fmt.Sprintf("Run JavaScript[%v] failed: %v", jscript, err),
+			Title:  fmt.Sprintf("Run JavaScript[%v] failed: %v", cmd.Code, err),
 		}}
 		c.JSON(http.StatusInternalServerError, response)
 		return
@@ -338,5 +337,20 @@ func DoExecute(c *gin.Context) {
 }
 
 func Replication(c *gin.Context) {
-	c.HTML(200, "server/replication", map[string]interface{}{})
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	defer mongo.Close()
+	result := bson.M{}
+	if err = mongo.Run(bson.M{"eval": `function () { return db.getReplicationInfo(); }`}, &result); err != nil {
+		logrus.Errorf("Get getReplicationInfo failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	h := utils.DefaultH(c)
+	h["ReplicationInfo"] = result
+	c.HTML(200, "server/replication", h)
 }
