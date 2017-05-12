@@ -46,14 +46,22 @@
 <script type="text/javascript" src="/public/js/app.js"></script>
 <script>
 
-  var dbNames = {{.DBNames}};
+  var dbInfos = {{.DBInfos}};
   var data = []; 
-  for (var i = 0; i < dbNames.length; i++) {
-      data.push({
-        title: dbNames[i],
-        type:"folder",
-        products: []
-      });
+  for (var i = 0; i < dbInfos.length; i++) {
+      temp = {
+        title: '<a href="/server/db/home/'+dbInfos[i]["Name"]+'">'+dbInfos[i]["Name"]+'</a>', 
+        type: "folder", 
+        id: dbInfos[i]["Name"],
+        products:[]
+      }
+      for(j = 0; j < dbInfos[i]["Collections"].length; j++) {
+        temp.products.push({
+          title: dbInfos[i]["Collections"][j], 
+          type: 'item'
+        })
+      }
+      data.push(temp);
   }
   //console.log({{.ServerCmdLineOpts}})
   $('#firstTree').tree({
@@ -61,13 +69,21 @@
       // 模拟异步加载
       setTimeout(function() {
         callback({data: options.products || data});
-      }, 200);
+      }, 0);
     },
+
     folderIcon:'database',
     itemIcon:'table',
     multiSelect: false,
     cacheItems: true,
     folderSelect: false
   });
+
+  // dbName = {{ .DBName }};
+  // console.log(dbName);
+  // if(dbName.length > 0) {
+  //   //$('#firstTree').tree('openFolder', $('#'+dbName));
+  //   $('#firstTree').tree('discloseAll');
+  // }
 </script>
 {{end}}

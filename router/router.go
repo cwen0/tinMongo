@@ -26,7 +26,7 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.POST("/execute", controllers.DoExecute)
 		authorized.GET("/replication", controllers.Replication)
 
-		authorized.GET("/db/home", controllers.DbHome)
+		authorized.GET("/db/home/:dbName", controllers.DBHome)
 		authorized.GET("/db/newCollection", controllers.DbNewCollection)
 		authorized.GET("/db/dbTransfer", controllers.DbTransfer)
 		authorized.GET("/db/dbExport", controllers.DbExport)

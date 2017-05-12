@@ -44,10 +44,28 @@ func DefaultH(c *gin.Context) gin.H {
 	}
 	host, _ := c.Get("host")
 	port, _ := c.Get("port")
+	type DBInfo struct {
+		Name        string
+		Collections []string
+	}
+	var dbInfos []*DBInfo
+	for _, name := range dbNames {
+		dbInfo := &DBInfo{
+			Name: name,
+		}
+		db := mongo.DB(name)
+		dbInfo.Collections, err = db.CollectionNames()
+		if err != nil {
+			logrus.Errorf("Database [%s] get collections name failed: %v", name, err)
+			c.HTML(http.StatusInternalServerError, "errors/500", nil)
+			return nil
+		}
+		dbInfos = append(dbInfos, dbInfo)
+	}
 	return gin.H{
 		"Host":    host,
 		"Port":    port,
-		"DBNames": dbNames,
+		"DBInfos": dbInfos,
 	}
 }
 

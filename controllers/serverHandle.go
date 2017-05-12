@@ -170,6 +170,8 @@ func DeleteDatabase(c *gin.Context) {
 			Status: http.StatusInternalServerError,
 			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
 		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
 	}
 	defer mongo.Close()
 	dbName := strings.TrimSpace(c.Param("dbName"))
@@ -182,6 +184,7 @@ func DeleteDatabase(c *gin.Context) {
 			Title:  fmt.Sprintf("Drop database [%s] failed: %v", dbName, err),
 		}}
 		c.JSON(http.StatusInternalServerError, response)
+		return
 	}
 	logrus.Infof("Drop database [%s] success", dbName)
 	c.JSON(http.StatusOK, response)
@@ -190,7 +193,7 @@ func DeleteDatabase(c *gin.Context) {
 func ProcessList(c *gin.Context) {
 	mongo, err := models.GetMongo()
 	if err != nil {
-		logrus.Errorf("Get mongo failed: %v", err)
+		logrus.Errorf("Get mongo session failed: %v", err)
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
