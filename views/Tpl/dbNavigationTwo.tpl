@@ -2,7 +2,7 @@
 <div>
   <ul class="am-nav am-nav-tabs">
     <li  {{if equal .active "home" }}class="am-active" {{end}}><a href="/server/db/home/{{ .DBName }}">统计</a></li>
-    <li {{if equal .active "newCollection" }}class="am-active" {{end}}><a href="/server/db/newCollection">创建集合</a></li>
+    <li {{if equal .active "newCollection" }}class="am-active" {{end}}><a href="/server/db/newCollection/{{.DBName}}">创建集合</a></li>
     <li><a href="/server/command">命令</a></li>
     <li><a href="/server/execute">执行代码</a></li>
     <li {{if equal .active "dbTransfer" }}class="am-active" {{end}}><a href="/server/db/dbTransfer">克隆</a></li>

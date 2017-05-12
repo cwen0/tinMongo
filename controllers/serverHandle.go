@@ -133,6 +133,8 @@ func CreateDatabase(c *gin.Context) {
 			Status: http.StatusInternalServerError,
 			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
 		}}
+		c.JSON(http.StatusInsufficientStorage, response)
+		return
 	}
 	dbName := strings.TrimSpace(c.PostForm("databaseName"))
 	collectionName := strings.TrimSpace(c.PostForm("collectionName"))

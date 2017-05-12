@@ -17,30 +17,31 @@
         创建集合<span class="am-icon-chevron-down am-fr" ></span></div>
      <div id="database-statistics" class="am-in am-container">
      <br>
-        <form class="am-form am-form-horizontal" >
+        <div class="am-form am-form-horizontal" id="new_collection">
             <div class="am-form-group">
                 <label class="am-u-sm-2 am-form-label">Name</label>
                 <div class="am-u-sm-8 am-u-end" >
-                  <input type="text"  placeholder="输入集合名">
+                  <input type="text"  placeholder="输入集合名" v-model="item.collection" >
                 </div>
             </div>
             <div class="me-cap-col-op">
               <span class="am-icon-angle-double-down" data-am-collapse="{target: '#cap-cal-op'}" >&nbsp;&nbsp;Capped Collection Options</span>
             </div>
 
-            <div id="cap-cal-op" class="am-in">
-               <div class="am-form-group">
+            <div id="cap-cal-op" class="am-in am-collapse">
+               <!-- <div class="am-form-group">
                     <label for="doc-ipt-3" class="am-u-sm-2 am-form-label">Is Capped</label>
                     <div class="am-u-sm-8 am-u-end am-checkbox me-cap-cal-op-checkbox" >
                         <label>
-                              <input type="checkbox">
+                              <input type="checkbox" v-model="item.isCapped" >
                         </label>
                     </div>
-               </div>
+               </div> -->
+               <br>
                <div class="am-form-group">
                   <label for="doc-ipt-3" class="am-u-sm-2 am-form-label">Size</label>
                   <div class="am-u-sm-8">
-                      <input type="text"  placeholder="输入字节大小" >
+                      <input type="number"  placeholder="输入字节大小" v-model="item.size" >
                   </div>
                   <div class="am-u-sm-2 ">
                       <span>bytes</span>
@@ -49,15 +50,27 @@
                <div class="am-form-group">
                   <label for="doc-ipt-3" class="am-u-sm-2 am-form-label">Max</label>
                   <div class="am-u-sm-8">
-                      <input type="text"  placeholder="输入文件数" >
+                      <input type="number"  placeholder="输入文件数" v-model="item.fileCount" >
                   </div>
                   <div class="am-u-sm-2 ">
                       <span>documents</span>
                   </div>
                </div>
             </div>
+            <div class="am-alert a am-alert-warning" id = "msg_alert" v-show="has_msg" style="display: none" >
+                    <button type="button" v-on:click="has_msg = false" class="am-close" >&times;</button>
+                    <p> ${ alert_msg } </p>
+                  </div>
+                  <div class="am-alert am-alert-success" data-am-alert style="display: none" v-show="is_success" >
+                    <button type="button" v-on:click="is_success = false" class="am-close">&times;</button>
+                    <p> ${ success_msg }</p>
+                  </div>
 
-        </form>
+            <br> 
+            <div class="am-form-group">
+                <button type="button" class="am-btn am-btn-default am-btn-block" v-on:click="createAction" >创建</button>
+            </div>
+        </div>
         <br>
         </div>
     </div>
@@ -67,7 +80,59 @@
 </div>
 
 {{template "Tpl/footer" .}}
-
+<script type="text/javascript" src="/public/js/vue.js"></script>
+<script type="text/javascript" src="/public/js/vue-resource.js"></script>
+<script type="text/javascript" >
+var newCollection = new Vue({
+  delimiters: ['${', '}'],
+  el: "#new_collection", 
+  data:{
+    is_success: false,
+    success_msg: '',
+    has_msg: false, 
+    alert_msg: '', 
+    item: {
+      dbName: {{ .DBName }},
+      collection: '', 
+      isCapped: false, 
+      size: 0, 
+      fileCount: 0
+    }, 
+    url: "/server/db/newCollection"
+  }, 
+  methods: {
+    createAction: function() {
+        if(this.item.collection == "") {
+          this.has_msg = true;
+          this.msg_alert = "Collection Name is required!!";
+          return;
+        }
+      //   if(this.item.isCapped == true) {
+      //     if(this.item.size <= 0) {
+      //       this.has_msg = true;
+      //       this.msg_alert = "Size is required!!";
+      //       return;
+      //   }
+      //   if(this.item.fileCount <= 0) {
+      //     this.has_msg = true;
+      //     this.msg_alert = "File count is required!!";
+      //     return;
+      //   }
+      // }
+      this.$http.post(this.url, this.item).then((response) => {
+        this.has_msg = false;
+        this.is_success = true;
+        this.success_msg = "create success !!!"
+      }).catch(this.requestError)
+    }, 
+    requestError: function(response) {
+      data = JSON.parse(response.bodyText);
+      this.alert_msg = data["errors"][0]["title"];
+      this.has_msg = true;
+    }
+  }
+})
+</script>
 </body>
 </html>
 {{end}}

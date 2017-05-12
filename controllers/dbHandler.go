@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -40,8 +41,66 @@ func DBHome(c *gin.Context) {
 	c.HTML(http.StatusOK, "db/home", h)
 }
 
-func DbNewCollection(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/newCollection", map[string]interface{}{})
+func DBNewCollection(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	h["DBName"] = dbName
+	c.HTML(http.StatusOK, "db/newCollection", h)
+}
+
+func ExecDBNewCollection(c *gin.Context) {
+	response := Wrapper{}
+	collectionInfo := struct {
+		DBName     string `json:"dbName"`
+		Collection string `json:"collection"`
+		IsCapped   bool   `json:"isCapped"`
+		Size       int    `json:"size"`
+		FileCount  int    `json:"fileCount"`
+	}{}
+	if err := c.BindJSON(&collectionInfo); err != nil {
+		logrus.Errorf("BindJSON failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	//capped := 0
+	//if collectionInfo.IsCapped {
+	//capped = 1
+	//}
+	db := mongo.DB(collectionInfo.DBName)
+	cmdMap := bson.M{
+		"create": collectionInfo.Collection,
+		//	"capped": capped,
+		"size": collectionInfo.Size,
+		"max":  collectionInfo.FileCount,
+	}
+
+	if err = db.Run(cmdMap, nil); err != nil {
+		logrus.Errorf("Run create collection[%v] failed: %v", cmdMap, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Run create collection[%v] failed: %v", cmdMap, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func DbTransfer(c *gin.Context) {
