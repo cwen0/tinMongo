@@ -15,14 +15,14 @@ type Auth struct {
 	IsAuth   int    `json:"isAuth"`
 }
 
-func (a *Auth) Connect() (*mgo.Session, error) {
+func (a *Auth) Connect() (*mgo.Session, string, error) {
 	url := fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", a.UserName, a.Password, a.HostName, a.Port, a.Database)
 	if a.IsAuth == 0 {
 		url = fmt.Sprintf("mongodb://%s:%d", a.HostName, a.Port)
 	}
 	session, err := mgo.Dial(url)
 	if err != nil {
-		return nil, err
+		return nil, url, err
 	}
-	return session, nil
+	return session, url, nil
 }

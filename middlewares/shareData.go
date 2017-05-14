@@ -16,6 +16,10 @@ func SharedData() gin.HandlerFunc {
 		if port := session.Get("port"); port != nil {
 			c.Set("port", port)
 		}
+
+		if url := session.Get("url"); url != nil {
+			c.Set("url", url)
+		}
 		c.Next()
 	}
 }

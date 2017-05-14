@@ -61,6 +61,7 @@
               error : function(response) {
                 data = JSON.parse(response.bodyText);
                 dom.del_alert_msg.find("p").text(data["errors"][0]["title"]);
+                dom.del_alert_msg.show();
               }
             });
          })

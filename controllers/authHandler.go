@@ -27,7 +27,7 @@ func LoginPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	mongo, err := auth.Connect()
+	mongo, url, err := auth.Connect()
 	if err != nil {
 		response.Errors = &Errors{Error{
 			Status: http.StatusBadRequest,
@@ -49,6 +49,7 @@ func LoginPost(c *gin.Context) {
 	//session.Set("mongo", fmt.Sprintf("%s:%s@%s:%d", auth.UserName, auth.Password, auth.UserName, auth.Port))
 	session.Set("host", auth.HostName)
 	session.Set("port", auth.Port)
+	session.Set("url", url)
 	session.Save()
 	logrus.Info("Login sucess")
 	c.JSON(http.StatusOK, response)
