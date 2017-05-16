@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +17,8 @@ import (
 	"github.com/cwen0/tinMongo/utils"
 	"github.com/gin-gonic/gin"
 )
+
+type Record map[string]interface{}
 
 func DBHome(c *gin.Context) {
 	dbName := strings.TrimSpace(c.Param("dbName"))
@@ -198,8 +203,116 @@ func ExecDBTransfer(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func DbExport(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbExport", map[string]interface{}{})
+func DBExport(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	db := mongo.DB(dbName)
+	collectionNames, err := db.CollectionNames()
+	if err != nil {
+		logrus.Errorf("Get collection names failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	h := utils.DefaultH(c)
+	h["DBName"] = dbName
+	h["CollectionNames"] = collectionNames
+	c.HTML(http.StatusOK, "db/dbExport", h)
+}
+
+func ExecDBExport(c *gin.Context) {
+	info := struct {
+		DBName      string `form:"dbName" json:"dbName"`
+		Colls       string `form:"colls" json:"colls"`
+		Collections []string
+		IsDownload  bool `form:"isDownload" json:"isDownload"`
+		IsGzip      bool `form:"isGzip" json:"isGzip"`
+	}{}
+	response := Wrapper{}
+	if err := c.Bind(&info); err != nil {
+		logrus.Errorf("ExecDBExport bad required: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please. fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	colls := strings.Split(info.Colls, ",")
+	for _, coll := range colls {
+		info.Collections = append(info.Collections, strings.TrimSpace(coll))
+	}
+	var contexts string
+	var countRows int
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	db := mongo.DB(info.DBName)
+	for _, collection := range info.Collections {
+		coll := db.C(collection)
+		indexs, _ := coll.Indexes()
+		for _, index := range indexs {
+			options := make(map[string]interface{})
+			options["Unique"] = index.Unique
+			optionsJson, err := json.Marshal(options)
+			if err != nil {
+				logrus.Errorf("Marshal [%v] failed: %v", options, err)
+				c.HTML(http.StatusInternalServerError, "errors/500", nil)
+				return
+			}
+			keys := make(map[string]interface{})
+			keys["Key"] = index.Key
+			keysJson, err := json.Marshal(keys)
+			if err != nil {
+				logrus.Errorf("Marshal [%v] failed: %v", keys, err)
+				c.HTML(http.StatusInternalServerError, "errors/500", nil)
+				return
+			}
+			contexts += fmt.Sprintf("\n/** {%s} indexs **/ndb.getCollection(\"%s\").ensureIndex(%s, %s);\n", collection, collection, keysJson, optionsJson)
+		}
+	}
+	for _, collection := range info.Collections {
+		contexts += fmt.Sprintf("\n/** %s  records **/\n", collection)
+		iter := db.C(collection).Find(nil).Iter()
+		defer iter.Close()
+		var one Record
+		for iter.Next(&one) {
+			countRows++
+			one, _ := one["data"].(Record)
+			oneJson, err := json.Marshal(one)
+			if err != nil {
+				logrus.Errorf("Marshal [%v] failed: %v", one, err)
+				c.HTML(http.StatusInternalServerError, "errors/500", nil)
+				return
+			}
+			contexts += fmt.Sprintf("db.getCollection(\"%s\").insert(%v);\n", collection, oneJson)
+		}
+	}
+	if info.IsDownload {
+		var b bytes.Buffer
+		w := gzip.NewWriter(&b)
+		if info.IsGzip {
+			w.Write([]byte(contexts))
+			w.Flush()
+			response.Datas = &Datas{Data{
+				Type:    "gzip",
+				Context: b,
+			}}
+		} else {
+			response.Datas = &Datas{Data{
+				Type:    "js",
+				Context: contexts,
+			}}
+		}
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func DbImport(c *gin.Context) {

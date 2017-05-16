@@ -6,7 +6,7 @@
     <li><a href="/server/command">命令</a></li>
     <li><a href="/server/execute">执行代码</a></li>
     <li {{if equal .active "dbTransfer" }}class="am-active" {{end}}><a href="/server/db/dbTransfer/{{.DBName}}">克隆</a></li>
-    <li {{if equal .active "dbExport" }}class="am-active" {{end}}><a href="/server/db/dbExport">导出</a></li>
+    <li {{if equal .active "dbExport" }}class="am-active" {{end}}><a href="/server/db/dbExport/{{.DBName}}">导出</a></li>
     <li {{if equal .active "dbImport" }}class="am-active" {{end}} ><a href="/server/db/dbImport">导入</a></li>
     <li {{if equal .active "dbUsers" }}class="am-active" {{end}} ><a href="/server/db/dbUsers">用户</a></li>
     <li><a href="#">操作</a></li>

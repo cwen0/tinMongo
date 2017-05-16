@@ -66,6 +66,7 @@ func DefaultH(c *gin.Context) gin.H {
 		"Host":    host,
 		"Port":    port,
 		"DBInfos": dbInfos,
+		"DBNames": dbNames,
 	}
 }
 
