@@ -17,7 +17,7 @@
         用户<span class="am-icon-chevron-down am-fr" ></span></div>
      <div id="database-statistics" class="am-in am-container">
         <br>
-         <a href="" id="users-list-a">Users</a> &nbsp; &nbsp;| &nbsp; &nbsp;  <a href="" id="add-user-a">Add User</a>
+         <a href="" id="users-list-a">Users</a> &nbsp; &nbsp;| &nbsp; &nbsp;  <a href="#" id="create_user_a">Add User</a>
         <br>
         <div id="users-list" >
           <table class="am-table am-table-striped am-table-hover">
@@ -25,12 +25,29 @@
                   <tr>
                       <th>ID</th>
                       <th>User</th>
-                      <th>Read Only</th>
-                      <th>Operation</th>
+                      <th>Roles</th>
+                      <th></th>
                   </tr>
               </thead>
               <tbody>
-
+                {{ range $user := .Users }}
+                   <tr>
+                     <td>{{ $user._id }}</td>
+                     <td>{{ $user.user }}</td>
+                     <td>
+                        <pre><script>
+                             prettyJson({{ $user.roles | marshal }})
+                             </script>
+                        </pre>
+                    </td>
+                     <td>
+                       <a href="#" >
+                          <i class="am-icon-trash am-icon-fw"></i>
+                          <input  type="hidden" value="{{ $user.user }}" >
+                        </a>
+                     </td>
+                   </tr>
+                {{ end }}
               </tbody>
           </table>
         </div>
@@ -43,9 +60,70 @@
   <!-- content end -->
   </div>
 </div>
+<div> 
+ <input type="hidden" id="dbName" value="{{ .DBName}}">
+</div>
+<div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="delete_user" aria-hidden="true" >
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">Delete user</div>
+    <div class="am-modal-bd">
+       <i class="am-icon-warning am-icon-fw" ></i>Type the user name local to drop
+      <input type="text" class="am-modal-prompt-input" id="delete_user_input">
+
+      <div class="am-alert a am-alert-warning" id="del_alert_msg" >
+          <button type="button" class="am-close">&times;</button>
+          <p> </p>
+      </div>
+    </div>
+    <div class="am-modal-footer">
+      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+      <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="delete_user_confirm" >提交</span>
+    </div>
+  </div>
+</div>
+<div class="me-modal am-modal" tabindex="-1" id="create_user">
+ <div class="am-modal-dialog">
+    <div class="am-modal-hd">Create User
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+      <div class="me-modal-bd am-modal-bd">
+        <div  class="am-form">
+             <div class="am-form-group">
+                <label class="me-label">User Name</label>
+                <input type="text" id="new_user" >
+            </div>
+             <div class="am-form-group">
+                <label class="me-label" > Password </label>
+                <input type="password" id="password" >
+            </div>
+            <div class="am-form-group">
+                <label class="me-label" > Confirm Password </label>
+                <input type="password" id="password2" >
+            </div>
+            <div class="am-form-group">
+              <label class="me-label" > Readonly </label>
+                <label class="am-radio-inline">
+                    <input type="radio"  value="1" name="isReadonly" checked="true"> true 
+                </label>
+                <label class="am-radio-inline">
+                  <input type="radio" value="0" name="isReadonly"> false
+                </label>
+            </div>
+        </div>
+      <div class="am-alert a am-alert-warning" id="create_alert_msg" >
+        <button type="button" class="am-close">&times;</button>
+        <p> </p>
+      </div>
+      </div>
+      <div class="am-modal-footer">
+        <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+        <span id="create_confirm" class="am-modal-btn" data-am-modal-confirm >确定</span>
+      </div>
+    </div>
+  </div>
 
 {{template "Tpl/footer" .}}
-<script src="/js/db/dbUsers.js"></script>
+<script src="/public/js/db/dbUsers.js"></script>
 </body>
 </html>
 {{end}}

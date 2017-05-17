@@ -35,7 +35,9 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.POST("/db/dbExport", controllers.ExecDBExport)
 		authorized.GET("/db/dbImport/:dbName", controllers.DBImport)
 		authorized.POST("/db/dbImport", controllers.ExecDBImport)
-		authorized.GET("/db/dbUsers", controllers.DbUsers)
+		authorized.GET("/db/dbUsers/:dbName", controllers.DBUsers)
+		authorized.POST("/db/dbUsers/:dbName/:user/delete", controllers.DeleteDBUser)
+		authorized.POST("/db/newDBUser", controllers.CreateDBUser)
 	}
 	return r
 }

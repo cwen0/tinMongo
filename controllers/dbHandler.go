@@ -29,6 +29,7 @@ func DBHome(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	db := mongo.DB(dbName)
 	result := bson.M{}
 	if err = db.Run(bson.D{{"dbStats", 1}}, &result); err != nil {
@@ -87,6 +88,7 @@ func ExecDBNewCollection(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	defer mongo.Close()
 	//capped := 0
 	//if collectionInfo.IsCapped {
 	//capped = 1
@@ -121,6 +123,7 @@ func DBTransfer(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	db := mongo.DB(dbName)
 	collectionNames, err := db.CollectionNames()
 	if err != nil {
@@ -212,6 +215,7 @@ func DBExport(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	db := mongo.DB(dbName)
 	collectionNames, err := db.CollectionNames()
 	if err != nil {
@@ -235,7 +239,7 @@ func ExecDBExport(c *gin.Context) {
 	}{}
 	response := Wrapper{}
 	if err := c.Bind(&info); err != nil {
-		logrus.Errorf("ExecDBExport bad required: %v", err)
+		logrus.Errorf("ExecDBExport bad request: %v", err)
 		response.Errors = &Errors{Error{
 			Status: http.StatusBadRequest,
 			Title:  "Please. fill out form corrently!!",
@@ -255,6 +259,7 @@ func ExecDBExport(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "errors/500", nil)
 		return
 	}
+	defer mongo.Close()
 	db := mongo.DB(info.DBName)
 	for _, collection := range info.Collections {
 		coll := db.C(collection)
@@ -318,8 +323,11 @@ func ExecDBExport(c *gin.Context) {
 }
 
 func DBImport(c *gin.Context) {
-	dbName := strings.TrimSpace(c.Param("dbName"))
 	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	dbName := strings.TrimSpace(c.Param("dbName"))
 	h["DBName"] = dbName
 	c.HTML(http.StatusOK, "db/dbImport", h)
 }
@@ -357,6 +365,7 @@ func ExecDBImport(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
+	defer mongo.Close()
 	db := mongo.DB(c.PostForm("dbName"))
 	switch fileType {
 	case "js":
@@ -401,6 +410,110 @@ func ExecDBImport(c *gin.Context) {
 	}
 }
 
-func DbUsers(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbUsers", map[string]interface{}{})
+func DBUsers(c *gin.Context) {
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	defer mongo.Clone()
+	db := mongo.DB(dbName)
+	err = db.AddUser("cwen1", "123", false)
+	if err != nil {
+		logrus.Error(err)
+	}
+	users := bson.M{}
+	err = db.Run(bson.D{{"usersInfo", 1}}, &users)
+	if err != nil {
+		logrus.Errorf("Get users failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	h["DBName"] = dbName
+	h["Users"] = users["users"]
+	c.HTML(http.StatusOK, "db/dbUsers", h)
+}
+
+func DeleteDBUser(c *gin.Context) {
+	response := Wrapper{}
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	userName := strings.TrimSpace(c.Param("user"))
+	if dbName == "" || userName == "" {
+		logrus.Error("Delete user failed: request data is bad")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Request data is bad !!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(dbName)
+	err = db.RemoveUser(userName)
+	if err != nil {
+		logrus.Errorf("Delete user failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Delete user failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func CreateDBUser(c *gin.Context) {
+	response := Wrapper{}
+	info := struct {
+		DBName     string `form:"dbName" json:"dbName"`
+		UserName   string `form:"user" json:"user"`
+		Password   string `form:"password" json:"password"`
+		IsReadonly bool   `form:"isReadonly" json:"isReadonly"`
+	}{}
+	if err := c.Bind(&info); err != nil {
+		logrus.Errorf("Create User bad request: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("Please, fill out form corrently!!"),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	if err := mongo.DB(info.DBName).AddUser(info.UserName, info.Password, info.IsReadonly); err != nil {
+		logrus.Errorf("Create User failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Create User failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }

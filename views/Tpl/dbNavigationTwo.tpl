@@ -8,7 +8,7 @@
     <li {{if equal .active "dbTransfer" }}class="am-active" {{end}}><a href="/server/db/dbTransfer/{{.DBName}}">克隆</a></li>
     <li {{if equal .active "dbExport" }}class="am-active" {{end}}><a href="/server/db/dbExport/{{.DBName}}">导出</a></li>
     <li {{if equal .active "dbImport" }}class="am-active" {{end}} ><a href="/server/db/dbImport/{{.DBName}}">导入</a></li>
-    <li {{if equal .active "dbUsers" }}class="am-active" {{end}} ><a href="/server/db/dbUsers">用户</a></li>
+    <li {{if equal .active "dbUsers" }}class="am-active" {{end}} ><a href="/server/db/dbUsers/{{.DBName}}">用户</a></li>
     <li><a href="#">操作</a></li>
 <!--     <li class="am-dropdown" data-am-dropdown>
       <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:;">
