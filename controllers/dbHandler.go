@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -275,7 +276,7 @@ func ExecDBExport(c *gin.Context) {
 				c.HTML(http.StatusInternalServerError, "errors/500", nil)
 				return
 			}
-			contexts += fmt.Sprintf("\n/** {%s} indexs **/ndb.getCollection(\"%s\").ensureIndex(%s, %s);\n", collection, collection, keysJson, optionsJson)
+			contexts += fmt.Sprintf("\n/** {%s} indexs **/\n db.getCollection(\"%s\").ensureIndex(%s, %s);\n", collection, collection, keysJson, optionsJson)
 		}
 	}
 	for _, collection := range info.Collections {
@@ -285,14 +286,15 @@ func ExecDBExport(c *gin.Context) {
 		var one Record
 		for iter.Next(&one) {
 			countRows++
-			one, _ := one["data"].(Record)
+			//	fmt.Println(one)
+			//one, _ := one["data"].(Record)
 			oneJson, err := json.Marshal(one)
 			if err != nil {
 				logrus.Errorf("Marshal [%v] failed: %v", one, err)
 				c.HTML(http.StatusInternalServerError, "errors/500", nil)
 				return
 			}
-			contexts += fmt.Sprintf("db.getCollection(\"%s\").insert(%v);\n", collection, oneJson)
+			contexts += fmt.Sprintf("db.getCollection(\"%s\").insert(%s);\n", collection, oneJson)
 		}
 	}
 	if info.IsDownload {
@@ -315,8 +317,88 @@ func ExecDBExport(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func DbImport(c *gin.Context) {
-	c.HTML(http.StatusOK, "db/dbImport", map[string]interface{}{})
+func DBImport(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	h := utils.DefaultH(c)
+	h["DBName"] = dbName
+	c.HTML(http.StatusOK, "db/dbImport", h)
+}
+
+func ExecDBImport(c *gin.Context) {
+	response := Wrapper{}
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		logrus.Errorf("Get Import file failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("Get Import file failed: %v", err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	fileData, err := ioutil.ReadAll(file)
+	if err != nil {
+		logrus.Errorf("Read context from file failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("Read context from file failed: %v", err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	fileType := c.PostForm("fileType")
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	db := mongo.DB(c.PostForm("dbName"))
+	switch fileType {
+	case "js":
+		code := fmt.Sprintf("function (){ %s }", fileData)
+		if err = db.Run(bson.M{"eval": code}, nil); err != nil {
+			logrus.Errorf("Run Import js code failed: %v", err)
+			response.Errors = &Errors{Error{
+				Status: http.StatusInternalServerError,
+				Title:  fmt.Sprintf("Run Import js code failed: %v", err),
+			}}
+			c.JSON(http.StatusInternalServerError, response)
+			return
+		}
+	case "json":
+		collection := c.PostForm("coll_name")
+		coll := db.C(collection)
+		lines := strings.Split(string(fileData), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				err = coll.Insert(line)
+				if err != nil {
+					logrus.Errorf("Run Import json data failed: %v", err)
+					response.Errors = &Errors{Error{
+						Status: http.StatusInternalServerError,
+						Title:  fmt.Sprintf("Run Import json data failed: %v", err),
+					}}
+					c.JSON(http.StatusInternalServerError, response)
+					return
+
+				}
+			}
+		}
+	default:
+		logrus.Error("Import file type is not supported")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Import file type is not supported",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 }
 
 func DbUsers(c *gin.Context) {

@@ -4,7 +4,8 @@
         dbCollections : $("form div:first input[name='collection']"), 
         export_btn: $("#export_btn"), 
         msg_alert: $("#msg_alert"), 
-        msg_success: $("msg_success")
+        msg_success: $("msg_success"),
+        alert: $(".am-alert")
     }
 
     var dbTransfer = {
@@ -67,7 +68,12 @@
                         dom.msg_success.hide();
                     }
                 }) 
-            })
+            });
+
+            dom.alert.find("button").bind("click",function() {
+                $(this).parent().hide();
+            }); 
+
         }
     }
     dbTransfer.init();
