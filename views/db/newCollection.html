@@ -96,8 +96,8 @@ var newCollection = new Vue({
       dbName: {{ .DBName }},
       collection: '', 
       isCapped: false, 
-      size: 0, 
-      fileCount: 0
+      size: '', 
+      fileCount: ''
     }, 
     url: "/server/db/newCollection"
   }, 
@@ -130,6 +130,7 @@ var newCollection = new Vue({
       data = JSON.parse(response.bodyText);
       this.alert_msg = data["errors"][0]["title"];
       this.has_msg = true;
+      this.is_success = false;
     }
   }
 })
