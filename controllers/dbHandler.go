@@ -517,3 +517,109 @@ func CreateDBUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func DBOperate(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(dbName)
+	collNames, err := db.CollectionNames()
+	if err != nil {
+		logrus.Errorf("Get collection names failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	h["DBName"] = dbName
+	h["Collections"] = collNames
+	c.HTML(http.StatusOK, "db/dbOperate", h)
+}
+
+func DBClear(c *gin.Context) {
+	response := Wrapper{}
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	if dbName == "" {
+		logrus.Error("DBClear DB name is empty")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("Please, fill out form corrently!!"),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(dbName)
+	collNames, err := db.CollectionNames()
+	if err != nil {
+		logrus.Errorf("Get collection names failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get collection names failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	for _, coll := range collNames {
+		db.C(coll).DropCollection()
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func DeleteCollection(c *gin.Context) {
+	response := Wrapper{}
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	if dbName == "" {
+		logrus.Error("DBClear DB name is empty")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("Please, fill out form corrently!!"),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	db := mongo.DB(dbName)
+	collName := strings.TrimSpace(c.Param("collName"))
+	err = db.C(collName).DropCollection()
+	if err != nil {
+		logrus.Errorf("Drop collection  failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Drop collection failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}

@@ -1,0 +1,141 @@
+{{define "db/dbOperate"}}
+{{template "Tpl/header" .}}
+{{template "Tpl/headerSecond" .}}
+{{template "Tpl/sidebar" .}}
+
+{{set . "navigation" "操作"}}
+{{set . "active" "dbOperate"}}
+<!-- content start -->
+
+  <div class="admin-content">
+  {{template "Tpl/dbNavigationOne" .}}
+  {{template "Tpl/dbNavigationTwo" .}}
+  <div class="am-g am-g-fixed am-margin-top">
+    <div class="am-panel am-panel-default">
+    <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#base-operate'}">
+        基本操作<span class="am-icon-chevron-down am-fr" ></span></div>
+     <div id="base-operate" class="am-in am-container">
+        <br>
+        <div class="me-cap-col-op">
+              <span class="am-icon-angle-double-down" data-am-collapse="{target: '#drop-db'}" >&nbsp;&nbsp;Drop Database</span>
+        </div>
+        
+        <div class="am-form am-form-horizontal am-in am-collapse" id="drop-db" >
+            <br>
+            <div class="am-form-group am-u-sm-8 am-u-sm-centered">
+                <button type="button" class="am-btn am-btn-default am-btn-block" id="del_database_btn">删除</button>
+            </div>
+          
+        </div>
+       <!--  <br>
+        <div class="me-cap-col-op">
+              <span class="am-icon-angle-double-down" data-am-collapse="{target: '#clear-db'}" >&nbsp;&nbsp;clear Database</span>
+        </div>
+        
+        <div class="am-form am-form-horizontal am-in am-collapse" id="clear-db" >
+            <br>
+            <div class="am-form-group am-u-sm-8 am-u-sm-centered">
+                <button type="button" class="am-btn am-btn-default am-btn-block" id="clear_database_btn">清空</button>
+            </div>
+        </div> -->
+        <br>
+     </div>
+    </div>
+  </div>
+  <div class="am-g am-g-fixed am-margin-top">
+    <div class="am-panel am-panel-default">
+    <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#collections'}">
+        集合列表<span class="am-icon-chevron-down am-fr" ></span></div>
+     <div id="collections" class="am-in am-container">
+        
+        <div id="collection-list" >
+          <table class="am-table am-table-striped am-table-hover">
+              <thead>
+                  <tr>
+                      <th>Collection Name</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                {{ range $coll := .Collections }}
+                  <tr>
+                    <td>{{ $coll}}</td>
+                    <td>
+                      <a href="#" >
+                          <i class="am-icon-trash am-icon-fw"></i>
+                          <input  type="hidden" value="{{ $coll }}" >
+                        </a>
+                    </td>
+                  </tr>
+                {{ end }}
+              </tbody>
+          </table>
+        </div>
+     </div>
+    </div>
+  </div>
+  <!-- content end -->
+  </div>
+</div>
+<div> 
+ <input type="hidden" id="dbName" value="{{ .DBName}}">
+</div>
+<div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="delete_database" aria-hidden="true" >
+    <div class="am-modal-dialog">
+      <div class="am-modal-hd">Delete Database</div>
+      <div class="am-modal-bd">
+         <i class="am-icon-warning am-icon-fw" ></i>Type the database name local to drop
+        <input type="text" class="am-modal-prompt-input" id="delete_database_input">
+
+        <div class="am-alert a am-alert-warning" id="del_alert_msg" >
+            <button type="button" class="am-close">&times;</button>
+            <p> </p>
+        </div>
+      </div>
+      <div class="am-modal-footer">
+        <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+        <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="delete_database_confirm">提交</span>
+      </div>
+    </div>
+</div>
+<!-- <div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="clear_database" aria-hidden="true" >
+    <div class="am-modal-dialog">
+      <div class="am-modal-hd">Clear Database</div>
+      <div class="am-modal-bd">
+         <i class="am-icon-warning am-icon-fw" ></i>Type the database name local to clear
+        <input type="text" class="am-modal-prompt-input" id="clear_database_input">
+
+        <div class="am-alert a am-alert-warning" id="clear_alert_msg" >
+            <button type="button" class="am-close">&times;</button>
+            <p> </p>
+        </div>
+      </div>
+      <div class="am-modal-footer">
+        <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+        <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="clear_database_confirm">提交</span>
+      </div>
+    </div>
+</div> -->
+<div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="delete_collection" aria-hidden="true" >
+    <div class="am-modal-dialog">
+      <div class="am-modal-hd">Delete Collection</div>
+      <div class="am-modal-bd">
+         <i class="am-icon-warning am-icon-fw" ></i>Type the collection name local to drop
+        <input type="text" class="am-modal-prompt-input" id="delete_collection_input">
+
+        <div class="am-alert a am-alert-warning" id="del_coll_alert_msg" >
+            <button type="button" class="am-close">&times;</button>
+            <p> </p>
+        </div>
+      </div>
+      <div class="am-modal-footer">
+        <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+        <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="delete_collection_confirm">提交</span>
+      </div>
+    </div>
+</div>
+<script type="text/javascript" src="/public/js/db/dbOperate.js"></script>
+{{template "Tpl/footer" .}}
+</body>
+</html>
+{{end}}

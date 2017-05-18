@@ -38,6 +38,9 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.GET("/db/dbUsers/:dbName", controllers.DBUsers)
 		authorized.POST("/db/dbUsers/:dbName/:user/delete", controllers.DeleteDBUser)
 		authorized.POST("/db/newDBUser", controllers.CreateDBUser)
+		authorized.GET("/db/dbOperate/:dbName", controllers.DBOperate)
+		authorized.POST("/db/dbOperate/:dbName/clear", controllers.DBClear)
+		authorized.POST("/db/collection/:dbName/:collName/delete", controllers.DeleteCollection)
 	}
 	return r
 }
