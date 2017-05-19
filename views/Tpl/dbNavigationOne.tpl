@@ -4,8 +4,11 @@
     <span class="am-icon-angle-double-right"></span>&nbsp;
     <a href="/server/db/home/{{.DBName}}"><span class="am-icon-database" id="nav_dbName">&nbsp;{{ .DBName }}</span></a>&nbsp;
     <span class="am-icon-angle-double-right"></span>&nbsp;
-    <!-- <a href="/db/home"><span class="am-icon-table">&nbsp;Apple</span></a> -->
-
+    
+	{{ if .Collection }} 
+		<a href="/server/collection/home/{{.DBName}}/{{.Collection}}"><span class="am-icon-table">&nbsp;{{ .Collection}}</span></a>
+		<span class="am-icon-angle-double-right"></span>&nbsp;
+	{{ end }}
     <span>{{ .navigation}}</span>
   </div>
 {{end}}

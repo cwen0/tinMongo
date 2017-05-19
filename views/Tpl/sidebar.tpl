@@ -57,7 +57,7 @@
       }
       for(j = 0; j < dbInfos[i]["Collections"].length; j++) {
         temp.products.push({
-          title: dbInfos[i]["Collections"][j], 
+          title: '<a href="/server/collection/home/' +dbInfos[i]["Name"] + '/' + dbInfos[i]["Collections"][j] + '">'+ dbInfos[i]["Collections"][j] + '</a>', 
           type: 'item'
         })
       }

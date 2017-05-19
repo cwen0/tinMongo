@@ -258,7 +258,6 @@ func ExecCommand(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	fmt.Println(cmdBson)
 	mongo, err := models.GetMongo()
 	if err != nil {
 		logrus.Errorf("Get mongo session failed: %v", err)
