@@ -87,3 +87,51 @@ func QueryDocument(c *gin.Context) {
 	}}
 	c.JSON(http.StatusOK, response)
 }
+
+func DeleteDocument(c *gin.Context) {
+	response := Wrapper{}
+	query := struct {
+		ID         string `form:"rowID" json:"rowID"`
+		DBName     string `form:"dbName" json:"dbName"`
+		Collection string `form:"collection" json:"collection"`
+	}{}
+	if err := c.Bind(&query); err != nil {
+		logrus.Errorf("Delete document failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	if query.ID == "" || query.DBName == "" || query.Collection == "" {
+		logrus.Error("Delete document: form data is not corrent")
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	if err = mongo.DB(query.DBName).C(query.Collection).RemoveId(bson.ObjectIdHex(query.ID)); err != nil {
+		logrus.Errorf("Delete document [%v] failed: %s", query, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Delete document [%v] failed %v", query, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
