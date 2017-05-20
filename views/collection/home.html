@@ -38,7 +38,8 @@
 					    v-for="(row, index) in rows"
 					    v-bind:key="row"
 					    v-bind:title="row"
-					    v-on:remove="collectionRemove(index, row)" >
+					    v-on:remove="collectionRemove(index, row)"
+					    v-on:edit="collectionEdit(index, row)" >
                       </row-result>
                     </div>
                   </div>
@@ -61,6 +62,27 @@
     <div class="am-modal-footer">
       <span class="am-modal-btn" data-am-modal-cancel>取消</span>
       <span class="am-modal-btn" data-am-modal-confirm>确定</span>
+    </div>
+  </div>
+</div>
+<div class="me-modal am-modal am-modal-confirm" tabindex="-1" id="edit-confirm">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">删除记录</div>
+    <div class="am-modal-bd">
+	    <div class="am-form">
+	    	<div class="am-form-group" style="text-align: left;">
+		     <textarea class="" rows="5" id="edit_row" >${ edit_row}</textarea>
+		  </div>
+	      你，确定要修改这条记录吗？
+	    </div>
+	     <div class="am-alert a am-alert-warning" v-show="edit_has_msg" >
+          <button type="button" v-on:click="edit_has_msg = false"  class="am-close">&times;</button>
+          <p> ${ edit_alert_msg}</p>
+        </div>
+    </div>
+    <div class="am-modal-footer">
+      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+      <span class="am-modal-btn" data-am-modal-confirm v-on:click="editSave();">保存</span>
     </div>
   </div>
 </div>

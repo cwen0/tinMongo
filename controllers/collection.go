@@ -135,3 +135,57 @@ func DeleteDocument(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func UpdateDocument(c *gin.Context) {
+	response := Wrapper{}
+	info := struct {
+		ID         string `form:"id" json:"id"`
+		Edited     string `form:"edited" json:"edited"`
+		DBName     string `form:"dbName" json:"dbName"`
+		Collection string `form:"collection" form:"collection"`
+	}{}
+	if err := c.Bind(&info); err != nil {
+		logrus.Errorf("Update document bad required: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	var edited interface{}
+	if err := bson.UnmarshalJSON([]byte(info.Edited), &edited); err != nil {
+		logrus.Errorf("UnmarshalJSON %s failed: %v", info.Edited, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("UnmarshalJSON %s failed: %v", info.Edited, err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	if err := mongo.DB(info.DBName).C(info.Collection).UpdateId(bson.ObjectIdHex(info.ID), edited); err != nil {
+		logrus.Errorf("Update document[%v] failed: %v", edited, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Update document[%v] failed: %v", edited, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func InsertDocument(c *gin.Context) {
+
+}

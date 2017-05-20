@@ -44,6 +44,8 @@ func SetRoutes(r *gin.Engine) *gin.Engine {
 		authorized.GET("/collection/home/:dbName/:collection", controllers.Document)
 		authorized.POST("/collection/document/query", controllers.QueryDocument)
 		authorized.POST("/collection/document/delete", controllers.DeleteDocument)
+		authorized.POST("/collection/document/update", controllers.UpdateDocument)
+		authorized.GET("/collection/document/insert", collection.InsertDocument)
 	}
 	return r
 }

@@ -6,7 +6,7 @@ Vue.component('row-result', {
     			<pre>{{ title }}</pre>
     		</div> 
     		<div class="am-u-sm-2" >
-    			<a >
+    			<a v-on:click="$emit('edit')" >
                     <i class="am-icon-pencil am-icon-fw"></i>
                 </a>
                 <a v-on:click="$emit('remove')" >
@@ -30,13 +30,24 @@ var doc = new Vue ({
 		del_row:null,
 		rows: [],
 		item: {
-			query: "{}",
+			query: "",
+			dbName: dbName, 
+			collection: collection
+		}, 
+		edit_row: null,
+		edit_index: null,
+		edit_alert_msg:"", 
+		edit_has_msg: false,
+		edit_send: {
+			id: null, 
+			edited: null,
 			dbName: dbName, 
 			collection: collection
 		}, 
 		// del_alert_msg: "",
 		// del_has_msg: false,
-		queryUrl: "/server/collection/document/query"
+		queryUrl: "/server/collection/document/query", 
+		editUrl: "/server/collection/document/update"
 		//deleteUrl: "/server/collection/document/delete"
 	},
 	filters: {
@@ -116,6 +127,44 @@ var doc = new Vue ({
         	})
     		// this.rows.splice(index, 1);
       //   	this.resultRow -= 1;
+        }, 
+
+        collectionEdit: function(index, row) {
+        	this.edit_row = row;
+        	this.edit_index = index;
+        	jQuery("#edit-confirm").modal({
+        		relatedTarget: this, 
+        		closeOnConfirm: false, 
+        		closeOnCancel: true
+        	})
+        }, 
+
+        editSave: function() {
+        	edited = jQuery("#edit_row").val();
+        	editedT = JSON.parse(edited);
+        	delete editedT._id;
+        	
+        	this.edit_send.edited = JSON.stringify(editedT);
+
+        	this.edit_send.id = this.edit_row._id;
+        	if(edited == "") {
+        		this.edit_alert_msg = "Please, fill out form corrently!!";
+        		this.edit_has_msg = true;
+        	}
+
+
+			this.$http.post(this.editUrl, this.edit_send).then((response) => {
+            	jQuery("#edit-confirm").modal('close');
+            	//this.rows[this.edit_index] = JSON.parse(edited);
+            	//console.log(this.rows);
+            	jQuery("#exec_btn").trigger("click");  
+            }).catch(function(response) {
+            	console.log(response);
+            	data = JSON.parse(response.bodyText);
+            	this.edit_alert_msg = data["errors"][0]["title"];
+            	this.edit_has_msg = true;
+            })
         }
+
 	}
 })
