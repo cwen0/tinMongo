@@ -187,5 +187,62 @@ func UpdateDocument(c *gin.Context) {
 }
 
 func InsertDocument(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	collection := strings.TrimSpace(c.Param("collection"))
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	h["DBName"] = dbName
+	h["Collection"] = collection
+	c.HTML(http.StatusOK, "collection/insert", h)
+}
 
+func ExecInsertDocument(c *gin.Context) {
+	response := Wrapper{}
+	info := struct {
+		Query      string `json:"query"`
+		DBName     string `json:"dbName"`
+		Collection string `json:"collection"`
+	}{}
+	if err := c.BindJSON(&info); err != nil {
+		logrus.Errorf("Insert document failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	var insert interface{}
+	if err := bson.UnmarshalJSON([]byte(info.Query), &insert); err != nil {
+		logrus.Errorf("UnmarshalJSON %s failed: %v", info.Query, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("UnmarshalJSON %s failed: %v", info.Query, err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	if err = mongo.DB(info.DBName).C(info.Collection).Insert(&insert); err != nil {
+		logrus.Errorf("Insert document[%v] failed: %v", insert, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Insert document[%v] failed: %v", insert, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
