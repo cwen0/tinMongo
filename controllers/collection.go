@@ -246,3 +246,69 @@ func ExecInsertDocument(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func ExplainDocument(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	collection := strings.TrimSpace(c.Param("collection"))
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	h["DBName"] = dbName
+	h["Collection"] = collection
+	c.HTML(http.StatusOK, "collection/explain", h)
+}
+
+func ExecExplainDocument(c *gin.Context) {
+	response := Wrapper{}
+	info := struct {
+		Query      string `json:"query"`
+		DBName     string `json:"dbName"`
+		Collection string `json:"collection"`
+	}{}
+	if err := c.BindJSON(&info); err != nil {
+		logrus.Errorf("Explain document failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	var query interface{}
+	if err := bson.UnmarshalJSON([]byte(info.Query), &query); err != nil {
+		logrus.Errorf("UnmarshalJSON %s failed: %v", info.Query, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  fmt.Sprintf("UnmarshalJSON %s failed: %v", info.Query, err),
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	result := bson.M{}
+	if err = mongo.DB(info.DBName).C(info.Collection).Find(query).Explain(result); err != nil {
+		logrus.Errorf("Explain document[%v] failed: %v", query, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Explain document[%v] failed: %v", query, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response.Datas = &Datas{Data{
+		Type:    "json",
+		Context: result,
+	}}
+	c.JSON(http.StatusOK, response)
+}
