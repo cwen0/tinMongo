@@ -312,3 +312,69 @@ func ExecExplainDocument(c *gin.Context) {
 	}}
 	c.JSON(http.StatusOK, response)
 }
+
+func IndexsDocument(c *gin.Context) {
+	dbName := strings.TrimSpace(c.Param("dbName"))
+	collection := strings.TrimSpace(c.Param("collection"))
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	defer mongo.Close()
+	indexs, err := mongo.DB(dbName).C(collection).Indexes()
+	if err != nil {
+		logrus.Errorf("Get indexs failed: %v", err)
+		c.HTML(http.StatusInternalServerError, "errors/500", nil)
+		return
+	}
+	// fmt.Println(indexs)
+	h := utils.DefaultH(c)
+	if h == nil {
+		return
+	}
+	h["DBName"] = dbName
+	h["Collection"] = collection
+	h["Indexs"] = indexs
+	c.HTML(http.StatusOK, "collection/indexs", h)
+}
+
+func DeleteIndex(c *gin.Context) {
+	response := Wrapper{}
+	info := struct {
+		Index      string `json:"index"`
+		DBName     string `json:"dbName"`
+		Collection string `json:"collection"`
+	}{}
+	if err := c.BindJSON(&info); err != nil {
+		logrus.Errorf("Delete index failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusBadRequest,
+			Title:  "Please, fill out form corrently!!",
+		}}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	mongo, err := models.GetMongo()
+	if err != nil {
+		logrus.Errorf("Get mongo session failed: %v", err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Get mongo session failed: %v", err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer mongo.Close()
+	if err = mongo.DB(info.DBName).C(info.Collection).DropIndexName(info.Index); err != nil {
+		logrus.Errorf("Delete index[%v] failed: %v", info, err)
+		response.Errors = &Errors{Error{
+			Status: http.StatusInternalServerError,
+			Title:  fmt.Sprintf("Delete index[%v] failed: %v", info, err),
+		}}
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}

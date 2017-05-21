@@ -1,0 +1,100 @@
+{{define "collection/indexs"}}
+{{template "Tpl/header" .}}
+{{template "Tpl/headerSecond" .}}
+{{template "Tpl/sidebar" .}}
+
+{{set . "navigation" "索引" }}
+{{set . "active" "indexs" }} 
+<div class="admin-content" id="indexs" >
+	{{template "Tpl/dbNavigationOne" .}}
+  	{{template "Tpl/collectionNavigationTwo" .}}
+  	<div class="am-g am-g-fixed am-margin-top">
+  		<div >
+            <a href="#" type="button"  id="add_index_btn" ><i class="am-icon-plus"></i>创建索引</a>
+        </div>
+        <div class="am-panel am-panel-default">
+        <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#indexs-info'}">索引<span class="am-icon-chevron-down am-fr" ></span></div>
+          <div id="indexs-info" class="am-in">
+            <table class="am-table am-table-bd am-table-bdrs am-table-striped am-table-hover">
+            <thead>
+                <th>Name</th>
+                <th>Keys</th>
+                <th>Is Unique</th>
+                <th></th>
+            </thead>
+              <tbody>
+                  {{ range $k, $v := .Indexs }}
+                  <tr>
+                    <td>{{$v.Name}}</td>
+                    <td>{{$v.Key}}</td>
+                    <td>{{$v.Unique}}</td>
+                    <td>
+                      <a v-on:click="deleteAction('{{$v.Name}}')" >
+                          <i class="am-icon-trash am-icon-fw"></i>
+                        </a>
+                    </td>
+                  </tr>
+                  {{ end }}
+              </tbody>
+            </table>
+          </div>
+        </div>  
+  	</div>
+<div class="me-modal am-modal am-modal-prompt" tabindex="-1" id="delete_index" aria-hidden="true" >
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">Delete index</div>
+    <div class="am-modal-bd">
+       <i class="am-icon-warning am-icon-fw" ></i>Type the index name local to drop
+      <input type="text" class="am-modal-prompt-input" id="delete_index_input" v-model="del_name" >
+
+      <div class="am-alert a am-alert-warning" v-show="has_del_msg" style="display: none" id="del_alert_msg" >
+          <button type="button" v-on:click="has_del_msg = false" class="am-close">&times;</button>
+          <p>${del_alert_msg}</p>
+      </div>
+    </div>
+    <div class="am-modal-footer">
+      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+      <span type="type" class="am-modal-btn data-am-modal-confirm" data-am-modal-confirm disabled="disabled" id="delete_index_confirm" v-on:click="doDeleteAction">提交</span>
+    </div>
+  </div>
+</div>
+<div class="me-modal am-modal" tabindex="-1" id="add_index">
+  <div class="am-modal-dialog">
+      <div class="am-modal-hd">Create index
+        <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+      </div>
+        <div class="me-modal-bd am-modal-bd">
+          <div  class="am-form">
+               <div class="am-form-group">
+                  <label class="me-label">Index Name</label>
+                  <input type="text" id="new_index_name" >
+              </div>
+               <div class="am-form-group">
+                  
+              </div>
+          </div>
+        <div class="am-alert a am-alert-warning" id="alert_msg" >
+          <button type="button" class="am-close">&times;</button>
+          <p> </p>
+        </div>
+        </div>
+        <div class="am-modal-footer">
+          <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+          <span id="my_confirm" class="am-modal-btn" data-am-modal-confirm >确定</span>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+{{template "Tpl/footer" .}}
+<script type="text/javascript" src="/public/js/vue.js"></script>
+<script type="text/javascript" src="/public/js/vue-resource.js"></script>
+<script type="text/javascript">
+var dbName = {{.DBName}};
+var collection = {{.Collection}}
+</script>
+<script type="text/javascript" src="/public/js/collection/indexs.js"></script>
+</body> 
+</html>
+{{end}}
