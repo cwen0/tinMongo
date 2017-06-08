@@ -10,7 +10,7 @@
   	{{template "Tpl/collectionNavigationTwo" .}}
   	<div class="am-g am-g-fixed am-margin-top">
   		<div >
-            <a href="#" type="button"  id="add_index_btn" ><i class="am-icon-plus"></i>创建索引</a>
+            <a href="#" type="button"  id="add_index_btn" v-on:click="addAction" ><i class="am-icon-plus"></i>创建索引</a>
         </div>
         <div class="am-panel am-panel-default">
         <div class="am-panel-hd am-cf me-panel-header" data-am-collapse="{target: '#indexs-info'}">索引<span class="am-icon-chevron-down am-fr" ></span></div>

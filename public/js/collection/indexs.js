@@ -36,6 +36,9 @@ var indexs = new Vue({
             	this.del_alert_msg = data["errors"][0]["title"];
             	this.has_del_msg = true;
             })
+		}, 
+		addAction: function() {
+			
 		}
 	}, 
 	watch: {

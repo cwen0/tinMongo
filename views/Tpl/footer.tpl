@@ -5,7 +5,7 @@
 
 <footer>
   <hr>
-  <p class="am-padding-left">© 2016 CWen.</p>
+  <p class="am-padding-left">© 2017 CWen.</p>
 </footer>
 <script src="/public/js/style.js"></script>
 {{end}}
